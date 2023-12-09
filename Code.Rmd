@@ -1,0 +1,109 @@
+---
+title: "Code"
+output: pdf_document
+---
+
+```{r, include=FALSE}
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+```
+
+# Read and Clean Data
+```{r}
+data <- read.csv("./data.csv") |>
+  janitor::clean_names() |>
+  mutate(
+    gender = case_when(
+      gender == "male" ~ 0,
+      gender == "female" ~ 1,
+      ),
+    ethnic_group = case_when(
+      ethnic_group == "group A" ~ 0,
+      ethnic_group == "group B" ~ 1,
+      ethnic_group == "group C" ~ 2,
+      ethnic_group == "group D" ~ 3,
+      ethnic_group == "group E" ~ 4,
+      ),
+    parent_educ = case_when(
+      parent_educ == "some highschool" ~ 0,
+      parent_educ == "some college" ~ 1,
+      parent_educ == "associate's degree" ~ 2,
+      parent_educ == "bachelor's degree" ~ 3,
+      parent_educ == "master's degree" ~ 4,
+      ),
+    lunch_type = case_when(
+      lunch_type == "standard" ~ 0,
+      lunch_type == "free/reduced" ~ 1,
+      ),
+    test_prep = case_when(
+      test_prep == "none" ~ 0,
+      test_prep == "completed" ~ 1,
+      ),
+    parent_marital_status = case_when(
+      parent_marital_status == "married" ~ 0,
+      parent_marital_status == "single" ~ 1,
+      parent_marital_status == "widowed" ~ 2,
+      parent_marital_status == "divorced" ~ 3,
+      ),
+    practice_sport = case_when(
+      practice_sport == "never" ~ 0,
+      practice_sport == "sometimes" ~ 1,
+      practice_sport == "regularly" ~ 2,
+      ),
+    is_first_child = case_when(
+      is_first_child == "no" ~ 0,
+      is_first_child == "yes" ~ 1,
+      ),
+    transport_means = case_when(
+      transport_means == "school_bus" ~ 0,
+      transport_means == "private" ~ 1,
+      ),
+    wkly_study_hours = case_when(
+      wkly_study_hours == "< 5" ~ 0,
+      wkly_study_hours == "10-May" ~ 1,
+      wkly_study_hours == "> 10" ~ 2,
+      )
+    )
+
+# Deal with NA -- Calculate the column mean (round to integer) and plug it into NA cell
+column_means <- round(colMeans(data, na.rm = TRUE), digits = 0)
+for (col in names(data)) {
+  data[[col]][is.na(data[[col]])] <- column_means[col]
+  }
+
+head(data)
+
+# Another data set for EDA
+data_long <- data |>
+  pivot_longer(cols = c(math_score, reading_score, writing_score),
+               names_to = "test", values_to = "score")
+```
+
+# Summary
+```{r}
+summary(data)
+```
+
+# Histograms
+```{r}
+ggplot(data, aes(x = math_score)) +
+  geom_histogram(binwidth = 5, fill = "skyblue", color = "black") +
+  labs(title = "Math Score Distribution")
+ggplot(data, aes(x = reading_score)) +
+  geom_histogram(binwidth = 5, fill = "salmon", color = "black") +
+  labs(title = "Reading Score Distribution")
+ggplot(data, aes(x = writing_score)) +
+  geom_histogram(binwidth = 5, fill = "lightgreen", color = "black") +
+  labs(title = "Writing Score Distribution")
+```
+
+# Boxplots
+```{r}
+ggplot(data_long, aes(x = test, y = score, fill = test)) +
+  geom_boxplot() +
+  labs(title = "Scores Boxplot", x = "Test Type", y = "Score") +
+  facet_wrap(~ test, scales = "free") +
+  scale_fill_manual(values = c("skyblue", "salmon", "lightgreen"))
+```
+

@@ -1,0 +1,22 @@
+---
+title: "Final Report"
+author: "Huanyu Chen, Yifei Liu, Xiaoting Tang, Longyu Zhang"
+date: "2023-12-16"
+output: pdf_document
+---
+
+# Abstract
+
+(condenses a brief introduction, brief description of methods, and main results into a one-paragraph summary)
+
+# Introduction
+(brief context and background of the problem)
+
+# Methods
+(data description and statistical methods)
+
+# Results
+
+# Conclusions/Discussion
+
+# A brief summary on each group member’s contribution (method, data analysis, writing, etc).
