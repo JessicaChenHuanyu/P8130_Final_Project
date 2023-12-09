@@ -7,6 +7,7 @@ output: pdf_document
 library(dplyr)
 library(ggplot2)
 library(tidyr)
+library(knitr)
 ```
 
 # Read and Clean Data
@@ -82,7 +83,8 @@ data_long <- data |>
 
 # Summary
 ```{r}
-summary(data)
+transposed_summary <- t(summary(data))
+knitr::kable(transposed_summary, caption = "Summary Statistics for Data", 2)
 ```
 
 # Histograms
