@@ -8,6 +8,7 @@ library(dplyr)
 library(ggplot2)
 library(tidyr)
 library(knitr)
+library(MASS)
 ```
 
 # Read and Clean Data
@@ -67,6 +68,7 @@ data <- read.csv("./data.csv") |>
       )
     )
 
+
 # Deal with NA -- Calculate the column mean (round to integer) and plug it into NA cell
 column_means <- round(colMeans(data, na.rm = TRUE), digits = 0)
 for (col in names(data)) {
@@ -108,4 +110,67 @@ ggplot(data_long, aes(x = test, y = score, fill = test)) +
   facet_wrap(~ test, scales = "free") +
   scale_fill_manual(values = c("skyblue", "salmon", "lightgreen"))
 ```
+
+# Diagnostics
+```{r}
+# Math
+model_math_full = lm(math_score ~ .-reading_score -writing_score, data = data)
+
+par(mfrow = c(2,2))
+plot(model_math_full)
+
+# reading
+model_reading_full = lm(reading_score ~ .-math_score -writing_score, data = data)
+
+par(mfrow = c(2,2))
+plot(model_reading_full)
+
+# writing
+model_writing_full = lm(writing_score ~ .-reading_score -math_score, data = data)
+
+par(mfrow = c(2,2))
+plot(model_writing_full)
+
+```
+
+# Transformation
+```{r}
+boxcox(model_reading_full)
+```
+
+# Outlier and influence points
+```{r}
+plot(model_math_full, which = 4)
+plot(model_reading_full, which = 4)
+plot(model_writing_full, which = 4)
+```
+
+# Multicollinearity
+```{r}
+performance::check_collinearity(model_math_full)
+performance::check_collinearity(model_reading_full)
+performance::check_collinearity(model_writing_full)
+```
+
+# Model building for math
+```{r}
+step(model_math_full, direction='backward')
+
+model_math_fit_back = lm(formula = math_score ~ gender + ethnic_group + parent_educ + 
+    lunch_type + test_prep + parent_marital_status + practice_sport + 
+    is_first_child + wkly_study_hours, data = data)
+
+summary(model_math_fit_back)
+
+step(model_math_full, direction='forward')
+
+model_math_fit_for = lm(formula = math_score ~ (gender + ethnic_group + parent_educ + 
+    lunch_type + test_prep + parent_marital_status + practice_sport + 
+    is_first_child + nr_siblings + transport_means + wkly_study_hours + 
+    reading_score + writing_score) - reading_score - writing_score, 
+    data = data)
+
+summary(model_math_fit_for)
+```
+
 
