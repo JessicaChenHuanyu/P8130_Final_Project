@@ -15,9 +15,14 @@ EXCLUDING figures and tables, references, appendix, that can be placed at the en
 # Introduction
 (brief context and background of the problem)
 
+- use predictors to predict Math, Reading, and Writing scores
+- determine which factors affect each score
+
+
 # Methods
 (data description and statistical methods)
 
+- data description: This dataset includes three test scores of students at a public school and a variety of personal and socioeconomic factors
 - changed the categorical data from words to numbers
 - for NAs, take the mean of the column, and replace the NAs with mean value. 
 - *a descriptive table with summary statistics for all variables created, but has a rounding problem*
@@ -32,7 +37,11 @@ EXCLUDING figures and tables, references, appendix, that can be placed at the en
 
 # Results
 
+- final model for each test score
+- analyze between models
+
 # Conclusions/Discussion
+
 
 # A brief summary on each group member’s contribution (method, data analysis, writing, etc).
 
