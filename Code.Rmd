@@ -9,6 +9,9 @@ library(ggplot2)
 library(tidyr)
 library(knitr)
 library(MASS)
+library(glmnet)
+
+set.seed(1)
 ```
 
 # Read and Clean Data
@@ -147,6 +150,7 @@ plot(model_writing_full, which = 4)
 
 # Multicollinearity
 ```{r}
+# check VIF
 performance::check_collinearity(model_math_full)
 performance::check_collinearity(model_reading_full)
 performance::check_collinearity(model_writing_full)
@@ -154,7 +158,7 @@ performance::check_collinearity(model_writing_full)
 
 # Model building for math
 ```{r}
-# backward model is better
+# backward model
 step(model_math_full, direction='backward')
 
 model_math_fit_back = lm(formula = math_score ~ gender + ethnic_group + parent_educ + 
@@ -163,55 +167,65 @@ model_math_fit_back = lm(formula = math_score ~ gender + ethnic_group + parent_e
 
 summary(model_math_fit_back)
 
-step(model_math_full, direction='forward')
-model_math_fit_for = lm(formula = math_score ~ (gender + ethnic_group + parent_educ + 
-    lunch_type + test_prep + parent_marital_status + practice_sport + 
-    is_first_child + nr_siblings + transport_means + wkly_study_hours + 
-    reading_score + writing_score) - reading_score - writing_score, 
-    data = data)
-summary(model_math_fit_for)
 
-step(model_math_full, direction = "both")
-model_math_fit_both = lm(formula = math_score ~ gender + ethnic_group + parent_educ + 
-    lunch_type + test_prep + parent_marital_status + practice_sport + 
-    is_first_child + wkly_study_hours, data = data)
-summary(model_math_fit_both)
+# lasso model
+lambda_seq = 10 ^ seq(-3, 0, by = .1)
+
+cv_object_math = cv.glmnet(as.matrix(data[1:11]), data$math_score,
+                         lambda = lambda_seq,
+                         nfolds = 5)
+
+model_math_lasso = glmnet(as.matrix(data[1:11]), data$math_score, lambda = cv_object_math$lambda.min, alpha = 1)
+coef(model_math_lasso)
+model_math_lasso$dev.ratio
 ```
 
 # Model building for reading
 ```{r}
-# backward better
+# backward model
 step(model_reading_full, direction='backward')
 model_reading_back = lm(formula = reading_score ~ gender + ethnic_group + parent_educ + 
     lunch_type + test_prep + parent_marital_status + is_first_child + 
     transport_means + wkly_study_hours, data = data)
 summary(model_reading_back)
+
+
+# lasso model
+lambda_seq = 10 ^ seq(-3, 0, by = .1)
+
+cv_object_reading = cv.glmnet(as.matrix(data[1:11]), data$reading_score,
+                         lambda = lambda_seq,
+                         nfolds = 5)
+cv_object_reading$lambda.min
+
+model_reading_lasso = glmnet(as.matrix(data[1:11]), data$reading_score, lambda = cv_object_reading$lambda.min)
+coef(model_reading_lasso)
+model_reading_lasso$dev.ratio
 ```
 
 # Model building for writing
 ```{r}
-# backward better
+# backward model
 step(model_writing_full, direction = "backward", )
 model_writing_back = lm(formula = writing_score ~ gender + ethnic_group + parent_educ + 
     lunch_type + test_prep + parent_marital_status + practice_sport + 
     is_first_child + transport_means + wkly_study_hours, data = data)
 summary(model_writing_back)
 
-```
 
-# lasso for math
-```{r}
-library(glmnet)
-
+# lasso model
 lambda_seq = 10 ^ seq(-3, 0, by = .1)
-set.seed(1)
-cv_object = cv.glmnet(as.matrix(data[1:11]), data$math_score,
+
+cv_object_writing = cv.glmnet(as.matrix(data[1:11]), data$writing_score,
                          lambda = lambda_seq,
                          nfolds = 5)
-cv_object$lambda.min
+cv_object_writing$lambda.min
 
-model_math_lasso = glmnet(as.matrix(data[1:11]), data$math_score, lambda = cv_object$lambda.min)
-coef(model_math_lasso)
+model_writing_lasso = glmnet(as.matrix(data[1:11]), data$writing_score, lambda = cv_object_writing$lambda.min)
+coef(model_writing_lasso)
+model_writing_lasso$dev.ratio
 
 ```
+
+
 

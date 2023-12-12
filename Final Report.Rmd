@@ -25,7 +25,9 @@ EXCLUDING figures and tables, references, appendix, that can be placed at the en
 - in diagnostics, all linear
 - no transformation needed for all three
 - no ouliters showed in plot, but for influential points
-- multicollinearity checked. no correlated varibales, as all are categorical predictors
+- multicollinearity checked. no correlated variables, VIF all small
+
+- two models created for each response. one backward (better compared to forward), one lasso
 
 
 # Results
