@@ -191,10 +191,27 @@ summary(model_reading_back)
 # Model building for writing
 ```{r}
 # backward better
-step(model_writing_full, direction = "backward")
+step(model_writing_full, direction = "backward", )
 model_writing_back = lm(formula = writing_score ~ gender + ethnic_group + parent_educ + 
     lunch_type + test_prep + parent_marital_status + practice_sport + 
     is_first_child + transport_means + wkly_study_hours, data = data)
 summary(model_writing_back)
 
 ```
+
+# lasso for math
+```{r}
+library(glmnet)
+
+lambda_seq = 10 ^ seq(-3, 0, by = .1)
+set.seed(1)
+cv_object = cv.glmnet(as.matrix(data[1:11]), data$math_score,
+                         lambda = lambda_seq,
+                         nfolds = 5)
+cv_object$lambda.min
+
+model_math_lasso = glmnet(as.matrix(data[1:11]), data$math_score, lambda = cv_object$lambda.min)
+coef(model_math_lasso)
+
+```
+
