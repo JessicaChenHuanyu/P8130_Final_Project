@@ -24,7 +24,7 @@ EXCLUDING figures and tables, references, appendix, that can be placed at the en
 - distribution of the response variable coded in histogram and boxplot
 - in diagnostics, all linear
 - no transformation needed for all three
-- *no ouliters showed in plot, but for influential points, cook's distance high, but < 0.5. include or exclude?*
+- no ouliters showed in plot, but for influential points
 - multicollinearity checked. no correlated varibales, as all are categorical predictors
 
 
