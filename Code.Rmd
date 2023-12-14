@@ -86,10 +86,17 @@ data_long <- data |>
                names_to = "test", values_to = "score")
 ```
 
+
 # Summary
 ```{r}
-transposed_summary <- t(summary(data))
-knitr::kable(transposed_summary, caption = "Summary Statistics for Data", 2)
+continuous_vars <- data[, c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14)]
+summary_df <- data.frame(
+Min = sapply(continuous_vars, min, na.rm = TRUE),
+Q1 = sapply(continuous_vars, function(x) quantile(x, probs = 0.25, na.rm = TRUE)), Median = sapply(continuous_vars, median, na.rm = TRUE),
+Mean = sapply(continuous_vars, mean, na.rm = TRUE),
+Q3 = sapply(continuous_vars, function(x) quantile(x, probs = 0.75, na.rm = TRUE)), Max = sapply(continuous_vars, max, na.rm = TRUE)
+)
+kable(summary_df, caption = "Summary Statistics of Data", digits = 1)
 ```
 
 # Histograms
@@ -119,18 +126,21 @@ ggplot(data_long, aes(x = test, y = score, fill = test)) +
 # Math
 model_math_full = lm(math_score ~ .-reading_score -writing_score, data = data)
 
+summary(model_math_full)
 par(mfrow = c(2,2))
 plot(model_math_full)
 
-# reading
+# Reading
 model_reading_full = lm(reading_score ~ .-math_score -writing_score, data = data)
 
+summary(model_reading_full)
 par(mfrow = c(2,2))
 plot(model_reading_full)
 
-# writing
+# Writing
 model_writing_full = lm(writing_score ~ .-reading_score -math_score, data = data)
 
+summary(model_writing_full)
 par(mfrow = c(2,2))
 plot(model_writing_full)
 
