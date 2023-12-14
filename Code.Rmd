@@ -159,14 +159,8 @@ performance::check_collinearity(model_writing_full)
 # Model building for math
 ```{r}
 # backward model
-step(model_math_full, direction='backward')
-
-model_math_fit_back = lm(formula = math_score ~ gender + ethnic_group + parent_educ + 
-    lunch_type + test_prep + parent_marital_status + practice_sport + 
-    is_first_child + wkly_study_hours, data = data)
-
+model_math_fit_back = step(model_math_full, direction='backward')
 summary(model_math_fit_back)
-
 
 # lasso model
 lambda_seq = 10 ^ seq(-3, 0, by = .1)
@@ -183,12 +177,8 @@ model_math_lasso$dev.ratio
 # Model building for reading
 ```{r}
 # backward model
-step(model_reading_full, direction='backward')
-model_reading_back = lm(formula = reading_score ~ gender + ethnic_group + parent_educ + 
-    lunch_type + test_prep + parent_marital_status + is_first_child + 
-    transport_means + wkly_study_hours, data = data)
+model_reading_back = step(model_reading_full, direction='backward')
 summary(model_reading_back)
-
 
 # lasso model
 lambda_seq = 10 ^ seq(-3, 0, by = .1)
@@ -206,12 +196,8 @@ model_reading_lasso$dev.ratio
 # Model building for writing
 ```{r}
 # backward model
-step(model_writing_full, direction = "backward", )
-model_writing_back = lm(formula = writing_score ~ gender + ethnic_group + parent_educ + 
-    lunch_type + test_prep + parent_marital_status + practice_sport + 
-    is_first_child + transport_means + wkly_study_hours, data = data)
+model_writing_back = step(model_writing_full, direction = "backward")
 summary(model_writing_back)
-
 
 # lasso model
 lambda_seq = 10 ^ seq(-3, 0, by = .1)
