@@ -52,7 +52,12 @@ After processing the data, we constructed a comprehensive descriptive table (**T
 # Conclusions/Discussion
 
 
-# A brief summary on each group member’s contribution (method, data analysis, writing, etc).
+# Contribution
+
+Huanyu Chen:
+Yifei Liu:
+Xiaoting Tang:
+Longyu Zhang: 
 
 # Appendix
 ## Table
