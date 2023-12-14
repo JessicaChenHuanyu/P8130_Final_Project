@@ -200,9 +200,26 @@ plot(model_writing_full, which = 4)
 
 ```{r}
 # check VIF
-performance::check_collinearity(model_math_full)
-performance::check_collinearity(model_reading_full)
-performance::check_collinearity(model_writing_full)
+vif_math =
+  performance::check_collinearity(model_math_full) |>
+  as_tibble() |>
+  mutate(VIF_CI = str_c("[", round(VIF_CI_low, 1), ", ", round(VIF_CI_high, 1), "]")) |>
+  dplyr::select(Term, VIF, VIF_CI, Tolerance)
+knitr::kable(x = vif_math, caption = "VIF for Math Score", digits = 1)
+
+vif_reading =
+  performance::check_collinearity(model_reading_full) |>
+  as_tibble() |>
+  mutate(VIF_CI = str_c("[", round(VIF_CI_low, 1), ", ", round(VIF_CI_high, 1), "]")) |>
+  dplyr::select(Term, VIF, VIF_CI, Tolerance)
+knitr::kable(x = vif_reading, caption = "VIF for Reading Score", digits = 1)
+
+vif_writing =
+  performance::check_collinearity(model_writing_full) |>
+  as_tibble() |>
+  mutate(VIF_CI = str_c("[", round(VIF_CI_low, 1), ", ", round(VIF_CI_high, 1), "]")) |>
+  dplyr::select(Term, VIF, VIF_CI, Tolerance)
+knitr::kable(x = vif_writing, caption = "VIF for Reading Score", digits = 1)
 ```
 
 # Model building for math
