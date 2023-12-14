@@ -197,20 +197,25 @@ knitr::kable(x = sum_data_score, caption = "Continuous Variables pre-analysis", 
 
 # Histograms
 ```{r}
-ggplot(data, aes(x = math_score)) +
-  geom_histogram(binwidth = 5, fill = "skyblue", color = "black") +
-  labs(title = "Math Score Distribution")
-ggplot(data, aes(x = reading_score)) +
-  geom_histogram(binwidth = 5, fill = "salmon", color = "black") +
-  labs(title = "Reading Score Distribution")
-ggplot(data, aes(x = writing_score)) +
-  geom_histogram(binwidth = 5, fill = "lightgreen", color = "black") +
-  labs(title = "Writing Score Distribution")
+data_long |>
+  ggplot(aes(x = score, fill = test)) +
+  geom_histogram(binwidth = 8, color = "#013571") +
+  labs(
+    title = "Scores Distribution by Subjects",
+    x = "Score",
+    y = "Count",
+  ) +
+  scale_fill_manual(values = c("#2E4E7D", "#405165", "#67A9CB")) +
+  facet_grid(~ test) +
+  theme_bw() +
+  theme(legend.position = "bottom") +
+  theme(plot.title = element_text(size = 15, face = "bold", hjust = 0.5))
 ```
 
 # Boxplots
 ```{r}
-ggplot(data_long, aes(x = test, y = score, fill = test)) +
+data_long |>
+  ggplot(aes(x = test, y = score, fill = test)) +
   geom_boxplot() +
   labs(title = "Scores Boxplot", x = "Test Type", y = "Score") +
   facet_wrap(~ test, scales = "free") +
