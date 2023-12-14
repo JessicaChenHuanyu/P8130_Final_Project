@@ -77,64 +77,6 @@ data =
   mutate(nr_siblings = factor(nr_siblings))
 
 '
-data <- read_csv("./data.csv") |>
-  janitor::clean_names() |>
-  mutate(
-    gender = case_when(
-      gender == "male" ~ 0,
-      gender == "female" ~ 1,
-      ),
-    ethnic_group = case_when(
-      ethnic_group == "group A" ~ 0,
-      ethnic_group == "group B" ~ 1,
-      ethnic_group == "group C" ~ 2,
-      ethnic_group == "group D" ~ 3,
-      ethnic_group == "group E" ~ 4,
-      ),
-    parent_educ = case_when(
-      parent_educ == "some highschool" ~ 0,
-      parent_educ == "some college" ~ 1,
-      parent_educ == "associate" ~ 2,
-      parent_educ == "bachelor" ~ 3,
-      parent_educ == "master" ~ 4,
-      ),
-    lunch_type = case_when(
-      lunch_type == "standard" ~ 0,
-      lunch_type == "free/reduced" ~ 1,
-      ),
-    test_prep = case_when(
-      test_prep == "none" ~ 0,
-      test_prep == "completed" ~ 1,
-      ),
-    parent_marital_status = case_when(
-      parent_marital_status == "married" ~ 0,
-      parent_marital_status == "single" ~ 1,
-      parent_marital_status == "widowed" ~ 2,
-      parent_marital_status == "divorced" ~ 3,
-      ),
-    practice_sport = case_when(
-      practice_sport == "never" ~ 0,
-      practice_sport == "sometimes" ~ 1,
-      practice_sport == "regularly" ~ 2,
-      ),
-    is_first_child = case_when(
-      is_first_child == "no" ~ 0,
-      is_first_child == "yes" ~ 1,
-      ),
-    transport_means = case_when(
-      transport_means == "school_bus" ~ 0,
-      transport_means == "private" ~ 1,
-      ),
-    wkly_study_hours = case_when(
-      wkly_study_hours == "< 5" ~ 0,
-      wkly_study_hours == "10-May" ~ 1,
-      wkly_study_hours == "> 10" ~ 2,
-      )
-    ) |>
-  drop_na()
-'
-
-'
 # Deal with NA -- Calculate the column mean (round to integer) and plug it into NA cell
 column_means <- round(colMeans(data, na.rm = TRUE), digits = 0)
 for (col in names(data)) {
@@ -152,19 +94,6 @@ data_long <- data |>
 
 
 # Summary
-```{r}
-'
-continuous_vars <- data[, c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14)]
-summary_df <- data.frame(
-Min = sapply(continuous_vars, min, na.rm = TRUE),
-Q1 = sapply(continuous_vars, function(x) quantile(x, probs = 0.25, na.rm = TRUE)), Median = sapply(continuous_vars, median, na.rm = TRUE),
-Mean = sapply(continuous_vars, mean, na.rm = TRUE),
-Q3 = sapply(continuous_vars, function(x) quantile(x, probs = 0.75, na.rm = TRUE)), Max = sapply(continuous_vars, max, na.rm = TRUE)
-)
-kable(summary_df, caption = "Summary Statistics of Data", digits = 1)
-'
-```
-
 
 ```{r}
 sum_data_fct =
@@ -196,6 +125,7 @@ knitr::kable(x = sum_data_score, caption = "Continuous Variables pre-analysis", 
 ```
 
 # Histograms
+
 ```{r}
 data_long |>
   ggplot(aes(x = score, fill = test)) +
@@ -203,8 +133,8 @@ data_long |>
   labs(
     title = "Scores Distribution by Subjects",
     x = "Score",
-    y = "Count",
-  ) +
+    y = "Count"
+    ) +
   scale_fill_manual(values = c("#2E4E7D", "#405165", "#67A9CB")) +
   facet_grid(~ test) +
   theme_bw() +
@@ -213,46 +143,53 @@ data_long |>
 ```
 
 # Boxplots
+
 ```{r}
 data_long |>
   ggplot(aes(x = test, y = score, fill = test)) +
   geom_boxplot() +
-  labs(title = "Scores Boxplot", x = "Test Type", y = "Score") +
+  labs(
+    title = "Scores Boxplot by Subjects",
+    x = "Test",
+    y = "Score"
+    ) +
   facet_wrap(~ test, scales = "free") +
-  scale_fill_manual(values = c("skyblue", "salmon", "lightgreen"))
+  scale_fill_manual(values = c("#2E4E7D", "#405165", "#67A9CB")) +
+  theme_bw() +
+  theme(legend.position = "bottom") +
+  theme(plot.title = element_text(size = 15, face = "bold", hjust = 0.5))
 ```
 
 # Diagnostics
+
 ```{r}
 # Math
-model_math_full = lm(math_score ~ .-reading_score -writing_score, data = data)
-
-summary(model_math_full)
+model_math_full = glm(math_score ~ . - reading_score - writing_score, data = data)
+model_math_full |> summary()
 par(mfrow = c(2,2))
 plot(model_math_full)
 
 # Reading
-model_reading_full = lm(reading_score ~ .-math_score -writing_score, data = data)
-
-summary(model_reading_full)
+model_reading_full = glm(reading_score ~ . - math_score - writing_score, data = data)
+model_reading_full |> summary()
 par(mfrow = c(2,2))
 plot(model_reading_full)
 
 # Writing
-model_writing_full = lm(writing_score ~ .-reading_score -math_score, data = data)
-
-summary(model_writing_full)
+model_writing_full = glm(writing_score ~ . - reading_score - math_score, data = data)
+model_writing_full |> summary()
 par(mfrow = c(2,2))
 plot(model_writing_full)
-
 ```
 
 # Transformation
+
 ```{r}
 boxcox(model_reading_full)
 ```
 
 # Outlier and influence points
+
 ```{r}
 plot(model_math_full, which = 4)
 plot(model_reading_full, which = 4)
@@ -260,6 +197,7 @@ plot(model_writing_full, which = 4)
 ```
 
 # Multicollinearity
+
 ```{r}
 # check VIF
 performance::check_collinearity(model_math_full)
@@ -268,6 +206,7 @@ performance::check_collinearity(model_writing_full)
 ```
 
 # Model building for math
+
 ```{r}
 # backward model
 step(model_math_full, direction='backward')
@@ -292,6 +231,7 @@ model_math_lasso$dev.ratio
 ```
 
 # Model building for reading
+
 ```{r}
 # backward model
 step(model_reading_full, direction='backward')
@@ -315,6 +255,7 @@ model_reading_lasso$dev.ratio
 ```
 
 # Model building for writing
+
 ```{r}
 # backward model
 step(model_writing_full, direction = "backward", )
