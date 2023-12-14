@@ -1,32 +1,41 @@
 ---
-title: "Final Report"
+title: "**P8130 Final Report (Project 1)**"
 author: "Huanyu Chen, Yifei Liu, Xiaoting Tang, Longyu Zhang"
 date: "2023-12-16"
-output: pdf_document
+output:
+  pdf_document:
+    latex_engine: pdflatex
+fontsize: 12pt
+geometry: margin=1in
+linestretch: 2
 ---
 
-not exceed 5 double-spaced pages using 11 or 12-point font
-EXCLUDING figures and tables, references, appendix, that can be placed at the end of the main text. 
+```{r, include=FALSE}
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(knitr)
+library(MASS)
+library(glmnet)
+
+set.seed(1)
+```
+
+not exceed 5 pages
 
 # Abstract
 
 (condenses a brief introduction, brief description of methods, and main results into a one-paragraph summary)
 
 # Introduction
-(brief context and background of the problem)
-
-- use predictors to predict Math, Reading, and Writing scores
-- determine which factors affect each score
+This study aims to predict student performance in math, reading, and writing using regression models. The study aims to identify the factors that influence academic success by exploring various variables, including personal characteristics such as gender, ethnicity, and parental education, as well as environmental factors like lunch type, test preparation, and weekly study hours. Additionally, the study aims to identify potential correlations between scores in different subjects. The study aims to provide educators and policymakers with practical insights to customize interventions, improve educational programs, and establish strong support structures that promote comprehensive academic progress among students by combining these analyses.
 
 
 # Methods
-(data description and statistical methods)
+This dataset contains information about students in a public school, including three test scores and various personal and socioeconomic factors. To aid analysis, categorical data has been converted into numerical representations based on their ordial order. To handle missing cells, the mean for each column is computed, and missing cells are replaced with the mean for that column in order to keep other variables still available to use in the regression model. This process ensures a more complete and representative dataset for further analysis.
 
-- data description: This dataset includes three test scores of students at a public school and a variety of personal and socioeconomic factors
-- changed the categorical data from words to numbers
-- for NAs, take the mean of the column, and replace the NAs with mean value. 
-- *a descriptive table with summary statistics for all variables created, but has a rounding problem*
-- distribution of the response variable coded in histogram and boxplot
+After processing the data, we constructed a comprehensive descriptive table (**Table 1**) that summarizes key statistical measures of this dataset, providing a snapshot of central tendencies and variability. Then the distribution of the three response variables (test scores) is presented in **Figure 1**, indicating an approximate normal distribution.
+
 - in diagnostics, all linear
 - no transformation needed for all three
 - no ouliters showed in plot, but for influential points
@@ -46,7 +55,99 @@ EXCLUDING figures and tables, references, appendix, that can be placed at the en
 # A brief summary on each group member’s contribution (method, data analysis, writing, etc).
 
 # Appendix
+## Table
+```{r echo = FALSE}
+# Read and Clean Data
+data <- read.csv("./data.csv") |>
+  janitor::clean_names() |>
+  mutate(
+    gender = case_when(
+      gender == "male" ~ 0,
+      gender == "female" ~ 1,
+      ),
+    ethnic_group = case_when(
+      ethnic_group == "group A" ~ 0,
+      ethnic_group == "group B" ~ 1,
+      ethnic_group == "group C" ~ 2,
+      ethnic_group == "group D" ~ 3,
+      ethnic_group == "group E" ~ 4,
+      ),
+    parent_educ = case_when(
+      parent_educ == "some highschool" ~ 0,
+      parent_educ == "some college" ~ 1,
+      parent_educ == "associate's degree" ~ 2,
+      parent_educ == "bachelor's degree" ~ 3,
+      parent_educ == "master's degree" ~ 4,
+      ),
+    lunch_type = case_when(
+      lunch_type == "standard" ~ 0,
+      lunch_type == "free/reduced" ~ 1,
+      ),
+    test_prep = case_when(
+      test_prep == "none" ~ 0,
+      test_prep == "completed" ~ 1,
+      ),
+    parent_marital_status = case_when(
+      parent_marital_status == "married" ~ 0,
+      parent_marital_status == "single" ~ 1,
+      parent_marital_status == "widowed" ~ 2,
+      parent_marital_status == "divorced" ~ 3,
+      ),
+    practice_sport = case_when(
+      practice_sport == "never" ~ 0,
+      practice_sport == "sometimes" ~ 1,
+      practice_sport == "regularly" ~ 2,
+      ),
+    is_first_child = case_when(
+      is_first_child == "no" ~ 0,
+      is_first_child == "yes" ~ 1,
+      ),
+    transport_means = case_when(
+      transport_means == "school_bus" ~ 0,
+      transport_means == "private" ~ 1,
+      ),
+    wkly_study_hours = case_when(
+      wkly_study_hours == "< 5" ~ 0,
+      wkly_study_hours == "10-May" ~ 1,
+      wkly_study_hours == "> 10" ~ 2,
+      )
+    )
 
+
+# Deal with NA -- Calculate the column mean (round to integer) and plug it into NA cell
+column_means <- round(colMeans(data, na.rm = TRUE), digits = 0)
+for (col in names(data)) {
+  data[[col]][is.na(data[[col]])] <- column_means[col]
+  }
+
+# Another data set for EDA
+data_long <- data |>
+  pivot_longer(cols = c(math_score, reading_score, writing_score),
+               names_to = "test", values_to = "score")
+```
+
+```{r echo = FALSE}
+# Summary
+continuous_vars <- data[, c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14)]
+summary_df <- data.frame(
+Min = sapply(continuous_vars, min, na.rm = TRUE),
+Q1 = sapply(continuous_vars, function(x) quantile(x, probs = 0.25, na.rm = TRUE)), Median = sapply(continuous_vars, median, na.rm = TRUE),
+Mean = sapply(continuous_vars, mean, na.rm = TRUE),
+Q3 = sapply(continuous_vars, function(x) quantile(x, probs = 0.75, na.rm = TRUE)), Max = sapply(continuous_vars, max, na.rm = TRUE)
+)
+kable(summary_df, caption = "Summary Statistics of Data", digits = 1)
+```
+
+## Figure
+```{r echo=FALSE, fig.align='center'}
+# Boxplots
+ggplot(data_long, aes(x = test, y = score, fill = test)) +
+  geom_boxplot() +
+  labs(title = "Figure 1: Scores Distribution (Boxplot)", x = "Test Type", y = "Score") +
+  facet_wrap(~ test, scales = "free") +
+  scale_fill_manual(values = c("skyblue", "salmon", "lightgreen")) +
+  theme(plot.title = element_text(hjust = 0.5))
+```
 
 Analytical questions (you may only answer some of them but properly addressing more will improve the rate of your report):
 1. Using variables 1-11 as the covariates to predict Math, Reading and Writing scores.
