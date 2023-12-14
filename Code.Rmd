@@ -1,9 +1,12 @@
 ---
 title: "Code"
-output: pdf_document
+output: 
+  pdf_document:
+    latex_engine: xelatex
 ---
 
 ```{r, include=FALSE}
+library(tidyverse)
 library(dplyr)
 library(ggplot2)
 library(tidyr)
@@ -16,7 +19,65 @@ set.seed(1)
 
 # Read and Clean Data
 ```{r}
-data <- read.csv("./data.csv") |>
+data =
+  read_csv("./data.csv") |>
+  janitor::clean_names() |>
+  mutate(
+    gender = factor(case_when(
+      gender == "male" ~ 0,
+      gender == "female" ~ 1,
+      )),
+    ethnic_group = factor(case_when(
+      ethnic_group == "group A" ~ 0,
+      ethnic_group == "group B" ~ 1,
+      ethnic_group == "group C" ~ 2,
+      ethnic_group == "group D" ~ 3,
+      ethnic_group == "group E" ~ 4,
+      )),
+    parent_educ = factor(case_when(
+      parent_educ == "some highschool" ~ 0,
+      parent_educ == "some college" ~ 1,
+      parent_educ == "associate's degree" ~ 2,
+      parent_educ == "bachelor's degree" ~ 3,
+      parent_educ == "master's degree" ~ 4,
+      )),
+    lunch_type = factor(case_when(
+      lunch_type == "standard" ~ 0,
+      lunch_type == "free/reduced" ~ 1,
+      )),
+    test_prep = factor(case_when(
+      test_prep == "none" ~ 0,
+      test_prep == "completed" ~ 1,
+      )),
+    parent_marital_status = factor(case_when(
+      parent_marital_status == "married" ~ 0,
+      parent_marital_status == "single" ~ 1,
+      parent_marital_status == "widowed" ~ 2,
+      parent_marital_status == "divorced" ~ 3,
+      )),
+    practice_sport = factor(case_when(
+      practice_sport == "never" ~ 0,
+      practice_sport == "sometimes" ~ 1,
+      practice_sport == "regularly" ~ 2,
+      )),
+    is_first_child = factor(case_when(
+      is_first_child == "no" ~ 0,
+      is_first_child == "yes" ~ 1,
+      )),
+    transport_means = factor(case_when(
+      transport_means == "school_bus" ~ 0,
+      transport_means == "private" ~ 1,
+      )),
+    wkly_study_hours = factor(case_when(
+      wkly_study_hours == "< 5" ~ 0,
+      wkly_study_hours == "10-May" ~ 1,
+      wkly_study_hours == "> 10" ~ 2,
+      ))
+    ) |>
+  mutate(nr_siblings = factor(nr_siblings))
+
+'
+data <- read_csv("./data.csv") |>
   janitor::clean_names() |>
   mutate(
     gender = case_when(
@@ -33,9 +94,9 @@ data <- read.csv("./data.csv") |>
     parent_educ = case_when(
       parent_educ == "some highschool" ~ 0,
       parent_educ == "some college" ~ 1,
-      parent_educ == "associate's degree" ~ 2,
-      parent_educ == "bachelor's degree" ~ 3,
-      parent_educ == "master's degree" ~ 4,
+      parent_educ == "associate" ~ 2,
+      parent_educ == "bachelor" ~ 3,
+      parent_educ == "master" ~ 4,
       ),
     lunch_type = case_when(
       lunch_type == "standard" ~ 0,
@@ -69,9 +130,11 @@ data <- read.csv("./data.csv") |>
       wkly_study_hours == "10-May" ~ 1,
       wkly_study_hours == "> 10" ~ 2,
       )
-    )
+    ) |>
+  drop_na()
+'
 
-
+'
 # Deal with NA -- Calculate the column mean (round to integer) and plug it into NA cell
 column_means <- round(colMeans(data, na.rm = TRUE), digits = 0)
 for (col in names(data)) {
@@ -79,6 +142,7 @@ for (col in names(data)) {
   }
 
 head(data)
+'
 
 # Another data set for EDA
 data_long <- data |>
@@ -89,6 +153,7 @@ data_long <- data |>
 
 # Summary
 ```{r}
+'
 continuous_vars <- data[, c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14)]
 summary_df <- data.frame(
 Min = sapply(continuous_vars, min, na.rm = TRUE),
@@ -97,6 +162,37 @@ Mean = sapply(continuous_vars, mean, na.rm = TRUE),
 Q3 = sapply(continuous_vars, function(x) quantile(x, probs = 0.75, na.rm = TRUE)), Max = sapply(continuous_vars, max, na.rm = TRUE)
 )
 kable(summary_df, caption = "Summary Statistics of Data", digits = 1)
+'
+```
+
+
+```{r}
+sum_data_fct =
+  data |>
+  dplyr::select(1:11) |>
+  skimr::skim() |>
+  dplyr::select(skim_variable, n_missing, complete_rate, factor.n_unique, factor.top_counts)
+
+colnames(sum_data_fct) = c("Variable", "Missing", "Complete Rate", "Unique", "Top Counts")
+
+knitr::kable(x = sum_data_fct, caption = "Categorical Variables pre-analysis", digits = 1)
+
+data =
+  data |>
+  drop_na()
+```
+
+
+```{r}
+sum_data_score =
+  data |>
+  dplyr::select(12:14) |>
+  skimr::skim() |>
+  dplyr::select(skim_variable, numeric.mean, numeric.sd, numeric.p0, numeric.p25, numeric.p50, numeric.p75, numeric.p100)
+
+colnames(sum_data_score) = c("Variable", "Mean", "SD", "Min", "Q1", "Median", "Q3", "Max")
+
+knitr::kable(x = sum_data_score, caption = "Continuous Variables pre-analysis", digits = 1)
 ```
 
 # Histograms
