@@ -1,8 +1,15 @@
 ---
-title: "Code"
-output: 
+title: "**P8130 Final Report (Project 1)**"
+author: 
+- "Huanyu Chen (hc3451)"
+- "Xiaoting Tang (xt2288)"
+- "Yifei Liu (yl5508)"
+- "Longyu Zhang (lz2951)"
+date: "2023-12-16"
+output:
   pdf_document:
-    latex_engine: xelatex
+    latex_engine: pdflatex
+
 ---
 
 ```{r, include=FALSE}
