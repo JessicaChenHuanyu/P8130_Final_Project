@@ -173,19 +173,19 @@ data_long |>
 
 ```{r}
 # Math
-model_math_full = glm(math_score ~ . - reading_score - writing_score, data = data)
+model_math_full = lm(math_score ~ . - reading_score - writing_score, data = data)
 model_math_full |> summary()
 par(mfrow = c(2,2))
 plot(model_math_full)
 
 # Reading
-model_reading_full = glm(reading_score ~ . - math_score - writing_score, data = data)
+model_reading_full = lm(reading_score ~ . - math_score - writing_score, data = data)
 model_reading_full |> summary()
 par(mfrow = c(2,2))
 plot(model_reading_full)
 
 # Writing
-model_writing_full = glm(writing_score ~ . - reading_score - math_score, data = data)
+model_writing_full = lm(writing_score ~ . - reading_score - math_score, data = data)
 model_writing_full |> summary()
 par(mfrow = c(2,2))
 plot(model_writing_full)
@@ -222,12 +222,16 @@ res_writing$outmat[5,]
 # Transformation
 
 ```{r}
+par(mfrow = c(1, 3), mar = c(8, 4, 4, 1))
+boxcox(model_math_full)
 boxcox(model_reading_full)
+boxcox(model_writing_full)
 ```
 
 # Outlier and influence points
 
 ```{r}
+par(mfrow = c(1, 3), mar = c(8, 4, 4, 1))
 plot(model_math_full, which = 4)
 plot(model_reading_full, which = 4)
 plot(model_writing_full, which = 4)
@@ -259,78 +263,172 @@ vif_writing =
 knitr::kable(x = vif_writing, caption = "VIF for Reading Score", digits = 1)
 ```
 
-# Model building for math
+# Model Selections
+
+## Stepwise Regressions
 
 ```{r}
-# backward model
-step(model_math_full, direction='backward')
+# math
+math_sr = step(model_math_full, direction = 'both')
 
-model_math_fit_back = lm(formula = math_score ~ gender + ethnic_group + parent_educ + 
-    lunch_type + test_prep + parent_marital_status + practice_sport + 
-    is_first_child + wkly_study_hours, data = data)
+res_math_sr = math_sr |> 
+  summary()
+res_math_sr
 
-summary(model_math_fit_back)
+tb_math_sr = res_math_sr |>
+  broom::tidy() |>
+  filter(term != "(Intercept)") |> 
+  dplyr::select(term, estimate, p.value)
+colnames(tb_math_sr) = c("Term", "Estimate", "P Value")
+knitr::kable(x = tb_math_sr, caption = "Math Scores Models by Stepwise Regression", digits = 1)
 
+# reading
+rea_sr = step(model_reading_full, direction = 'both')
 
-# lasso model
-lambda_seq = 10 ^ seq(-3, 0, by = .1)
+res_rea_sr = rea_sr |> 
+  summary()
+res_rea_sr
 
-cv_object_math = cv.glmnet(as.matrix(data[1:11]), data$math_score,
+tb_rea_sr = res_rea_sr |>
+  broom::tidy() |>
+  filter(term != "(Intercept)") |> 
+  dplyr::select(term, estimate, p.value)
+colnames(tb_rea_sr) = c("Term", "Estimate", "P Value")
+knitr::kable(x = tb_rea_sr, caption = "Reading Scores Models by Stepwise Regression", digits = 1)
+
+# writing
+wri_sr = step(model_writing_full, direction = 'both')
+
+res_wri_sr = wri_sr |> 
+  summary()
+res_wri_sr
+
+tb_wri_sr = res_wri_sr |>
+  broom::tidy() |>
+  filter(term != "(Intercept)") |> 
+  dplyr::select(term, estimate, p.value)
+colnames(tb_wri_sr) = c("Term", "Estimate", "P Value")
+knitr::kable(x = tb_wri_sr, caption = "Writing Scores Models by Stepwise Regression", digits = 1)
+```
+
+## Lasso Models
+
+```{r}
+lambda_seq = 10 ^ seq(-2, 2, by = .1)
+
+#math
+cv_object_math = 
+  cv.glmnet(as.matrix(data[1:11]), data$math_score,
                          lambda = lambda_seq,
                          nfolds = 5)
 
-model_math_lasso = glmnet(as.matrix(data[1:11]), data$math_score, lambda = cv_object_math$lambda.min, alpha = 1)
+opt_lambda_math = cv_object_math$lambda.min
+
+#variables contraction
+glmnet(as.matrix(data[1:11]), data$math_score, lambda = lambda_seq) |>
+  broom::tidy() |>
+  dplyr::select(term, lambda, estimate) |> 
+  complete(term, lambda, fill = list(estimate = 0) ) |> 
+  filter(term != "(Intercept)") |> 
+  ggplot(aes(x = log(lambda, 10), y = estimate, group = term, color = term)) + 
+  geom_path(size = 0.8) + 
+  geom_vline(xintercept = log(opt_lambda_math, 10), color = "red", linetype = "dashed", size = 1) +
+  theme_bw() +
+  theme(legend.position = "bottom")
+
+tb_la_math = tibble(
+  lambda = cv_object_math$lambda,
+  mean_cv_error = cv_object_math$cvm) |>
+  filter(lambda < 1)
+
+#choosing optimal lambda
+tb_la_math |>
+  ggplot(aes(x = lambda, y = mean_cv_error)) +
+  geom_point() +
+  theme_bw()
+
+#math result
+model_math_lasso = glmnet(as.matrix(data[1:11]), data$math_score, lambda = opt_lambda_math, alpha = 1)
 coef(model_math_lasso)
 model_math_lasso$dev.ratio
 ```
 
-# Model building for reading
 
 ```{r}
-# backward model
-step(model_reading_full, direction='backward')
-model_reading_back = lm(formula = reading_score ~ gender + ethnic_group + parent_educ + 
-    lunch_type + test_prep + parent_marital_status + is_first_child + 
-    transport_means + wkly_study_hours, data = data)
-summary(model_reading_back)
-
-
-# lasso model
-lambda_seq = 10 ^ seq(-3, 0, by = .1)
-
-cv_object_reading = cv.glmnet(as.matrix(data[1:11]), data$reading_score,
+#reading
+cv_object_reading = 
+  cv.glmnet(as.matrix(data[1:11]), data$reading_score,
                          lambda = lambda_seq,
                          nfolds = 5)
-cv_object_reading$lambda.min
 
-model_reading_lasso = glmnet(as.matrix(data[1:11]), data$reading_score, lambda = cv_object_reading$lambda.min)
+opt_lambda_reading = cv_object_reading$lambda.min
+
+#variables contraction
+glmnet(as.matrix(data[1:11]), data$reading_score, lambda = lambda_seq) |>
+  broom::tidy() |>
+  dplyr::select(term, lambda, estimate) |> 
+  complete(term, lambda, fill = list(estimate = 0) ) |> 
+  filter(term != "(Intercept)") |> 
+  ggplot(aes(x = log(lambda, 10), y = estimate, group = term, color = term)) + 
+  geom_path(size = 0.8) + 
+  geom_vline(xintercept = log(opt_lambda_reading, 10), color = "red", linetype = "dashed", size = 1) +
+  theme_bw() +
+  theme(legend.position = "bottom")
+
+tb_la_reading = tibble(
+  lambda = cv_object_reading$lambda,
+  mean_cv_error = cv_object_reading$cvm) |>
+  filter(lambda < 1)
+
+#choosing optimal lambda
+tb_la_reading |>
+  ggplot(aes(x = lambda, y = mean_cv_error)) +
+  geom_point() +
+  theme_bw()
+
+#reading result
+model_reading_lasso = glmnet(as.matrix(data[1:11]), data$reading_score, lambda = opt_lambda_math, alpha = 1)
 coef(model_reading_lasso)
 model_reading_lasso$dev.ratio
 ```
 
-# Model building for writing
 
 ```{r}
-# backward model
-step(model_writing_full, direction = "backward", )
-model_writing_back = lm(formula = writing_score ~ gender + ethnic_group + parent_educ + 
-    lunch_type + test_prep + parent_marital_status + practice_sport + 
-    is_first_child + transport_means + wkly_study_hours, data = data)
-summary(model_writing_back)
-
-
-# lasso model
-lambda_seq = 10 ^ seq(-3, 0, by = .1)
-
-cv_object_writing = cv.glmnet(as.matrix(data[1:11]), data$writing_score,
+#writing
+cv_object_writing = 
+  cv.glmnet(as.matrix(data[1:11]), data$writing_score,
                          lambda = lambda_seq,
                          nfolds = 5)
-cv_object_writing$lambda.min
 
-model_writing_lasso = glmnet(as.matrix(data[1:11]), data$writing_score, lambda = cv_object_writing$lambda.min)
+opt_lambda_writing = cv_object_writing$lambda.min
+
+#variables contraction
+glmnet(as.matrix(data[1:11]), data$writing_score, lambda = lambda_seq) |>
+  broom::tidy() |>
+  dplyr::select(term, lambda, estimate) |> 
+  complete(term, lambda, fill = list(estimate = 0) ) |> 
+  filter(term != "(Intercept)") |> 
+  ggplot(aes(x = log(lambda, 10), y = estimate, group = term, color = term)) + 
+  geom_path(size = 0.8) + 
+  geom_vline(xintercept = log(opt_lambda_writing, 10), color = "red", linetype = "dashed", size = 1) +
+  theme_bw() +
+  theme(legend.position = "bottom")
+
+tb_la_writing = tibble(
+  lambda = cv_object_writing$lambda,
+  mean_cv_error = cv_object_writing$cvm) |>
+  filter(lambda < 1)
+
+#choosing optimal lambda
+tb_la_writing |>
+  ggplot(aes(x = lambda, y = mean_cv_error)) +
+  geom_point() +
+  theme_bw()
+
+#writing result
+model_writing_lasso = glmnet(as.matrix(data[1:11]), data$writing_score, lambda = opt_lambda_writing, alpha = 1)
 coef(model_writing_lasso)
 model_writing_lasso$dev.ratio
-
 ```
 
 
