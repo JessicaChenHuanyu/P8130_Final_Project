@@ -263,6 +263,7 @@ vif_writing =
 knitr::kable(x = vif_writing, caption = "VIF for Reading Score", digits = 1)
 ```
 
+
 # Model Selections
 
 ## Stepwise Regressions
@@ -431,5 +432,67 @@ coef(model_writing_lasso)
 model_writing_lasso$dev.ratio
 ```
 
+## adding one score variable
+
+```{r}
+#correlation plot for scores
+corrplot::corrplot(cor(data[12:14]), type = "upper")
+```
+
+
+```{r}
+# Math
+math_1 = lm(math_score ~ . - reading_score, data = data) |>
+  step(direction = "both")
+math_1 |> summary()
+
+
+math_2 = lm(math_score ~ . - writing_score, data = data) |>
+  step(direction = "both")
+math_2 |> summary()
+
+# Reading
+reading_math = lm(reading_score ~ . - writing_score, data = data) |>
+  step(direction = "both")
+reading_math |> summary()
+
+
+# Writing
+writing_math = lm(writing_score ~ . - reading_score, data = data) |>
+  step(direction = "both")
+writing_math |> summary()
+```
+
+
+```{r}
+# check VIF
+vif_math_1 =
+  performance::check_collinearity(math_1) |>
+  as_tibble() |>
+  mutate(VIF_CI = str_c("[", round(VIF_CI_low, 1), ", ", round(VIF_CI_high, 1), "]")) |>
+  dplyr::select(Term, VIF, VIF_CI, Tolerance)
+knitr::kable(x = vif_math_1, caption = "VIF for Math Score", digits = 1)
+
+vif_math_2 =
+  performance::check_collinearity(math_2) |>
+  as_tibble() |>
+  mutate(VIF_CI = str_c("[", round(VIF_CI_low, 1), ", ", round(VIF_CI_high, 1), "]")) |>
+  dplyr::select(Term, VIF, VIF_CI, Tolerance)
+knitr::kable(x = vif_math_2, caption = "VIF for Math Score", digits = 1)
+
+vif_reading_math =
+  performance::check_collinearity(reading_math) |>
+  as_tibble() |>
+  mutate(VIF_CI = str_c("[", round(VIF_CI_low, 1), ", ", round(VIF_CI_high, 1), "]")) |>
+  dplyr::select(Term, VIF, VIF_CI, Tolerance)
+knitr::kable(x = vif_reading_math, caption = "VIF for Reading Score", digits = 1)
+
+vif_writing_math =
+  performance::check_collinearity(writing_math) |>
+  as_tibble() |>
+  mutate(VIF_CI = str_c("[", round(VIF_CI_low, 1), ", ", round(VIF_CI_high, 1), "]")) |>
+  dplyr::select(Term, VIF, VIF_CI, Tolerance)
+knitr::kable(x = vif_writing_math, caption = "VIF for Reading Score", digits = 1)
+```
 
 
