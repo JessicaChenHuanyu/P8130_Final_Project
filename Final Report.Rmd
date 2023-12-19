@@ -59,6 +59,22 @@ tendencies and variability. The distribution of the three response
 variables (test scores) is presented in **Figure 1** (histogram) and
 **Figure 2** (boxplot), indicating a normal distribution.
 
+Then we fitted the "full model" using the score of three subjects respectively as the response variables, which consists of all 11 categorical variables as predictors. The model diagnostics are conducted by generating four plot for each model: Residuals vs Fitted, Q-Q Residuals, Scale-Location and Residuals vs Leverage (**Figure 3-5**). Next, we use BIC-based procedures to select the appropriate subsets of predictors for three subjects (**Figure 6-9**).
+
+Based on the full models, we did some tests and calculations:
+
+First, we conducted boxcox method (**Figure 6**) to determine if there's any transformation needed.
+
+Second, calculated Cook's distance (**Figure 7**) to check the existence of outliers and influence points.
+
+Finally, in order to test the multicollinearity among predictors, we calculated VIF as the criterion of multicollinearity (**Table 3-5**).
+
+After all the steps above, we conducted model selection using both stepwise selection method and LASSO method. For stepwise method, the remaining predictors, coefficients and p-values are reported in **Table 7-9**.
+
+In the selection procedure using LASSO method, for each subject we used cross-validation to decide the optimal value of method parameter $\lambda$, and then fitted LASSO model with this optimal value (**Figure 8-10**).
+
+Finally, we tried to figure out if it is possible to leverage one score as the auxiliary information to learn the model for another score (still its model against variables 1-11) better. we plotted the correlation among three score variables (**Figure 11**). Then we refitted the linear models for the scores of three subjects using eleven categorical variables and one other score variable of a different subject as predictors (**Figure 12-17**). The VIFs are calculated for all six models generated in this step to reveal the potential multicollinearity (**Table 17-22**).
+
 # Results
 
 **Table 3**, **Table 4**, and **Table 5** display the regression models

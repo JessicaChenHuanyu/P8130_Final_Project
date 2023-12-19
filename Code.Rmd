@@ -191,7 +191,7 @@ par(mfrow = c(2,2))
 plot(model_writing_full)
 ```
 
-# criterion-based Procedures
+# Criterion-based Procedures
 
 ```{r}
 math_c = regsubsets(math_score ~ . - reading_score - writing_score, data = data)
@@ -436,7 +436,7 @@ coef(model_writing_lasso)
 model_writing_lasso$dev.ratio
 ```
 
-## adding one score variable
+## Adding one score variable
 
 ```{r}
 #correlation plot for scores
@@ -448,29 +448,107 @@ corrplot::corrplot(cor(data[12:14]), type = "upper")
 # Math
 math_reading = lm(math_score ~ . - writing_score, data = data) |>
   step(direction = "both")
-math_reading |> summary()
+
+math_reading_sum =
+  math_reading |> 
+  summary()
+
+math_reading_sum
+
+tb_math_reading = 
+  math_reading_sum |>
+  broom::tidy() |>
+  filter(term != "(Intercept)") |> 
+  dplyr::select(term, estimate, p.value)
+colnames(tb_math_reading) = c("Term", "Estimate", "P Value")
+knitr::kable(x = tb_math_reading, caption = "Math Scores Models Using Reading Score as Additional Predictor", digits = 1)
 
 math_writing = lm(math_score ~ . - reading_score, data = data) |>
   step(direction = "both")
-math_writing |> summary()
+
+math_writing_sum =
+  math_writing |> 
+  summary()
+
+math_writing_sum
+
+tb_math_writing = 
+  math_writing_sum |>
+  broom::tidy() |>
+  filter(term != "(Intercept)") |> 
+  dplyr::select(term, estimate, p.value)
+colnames(tb_math_writing) = c("Term", "Estimate", "P Value")
+knitr::kable(x = tb_math_writing, caption = "Math Scores Models Using Writing Score as Additional Predictor", digits = 1)
 
 # Reading
 reading_math = lm(reading_score ~ . - writing_score, data = data) |>
   step(direction = "both")
-reading_math |> summary()
+
+reading_math_sum =
+  reading_math |> 
+  summary()
+
+reading_math_sum
+
+tb_reading_math = 
+  reading_math_sum |>
+  broom::tidy() |>
+  filter(term != "(Intercept)") |> 
+  dplyr::select(term, estimate, p.value)
+colnames(tb_reading_math) = c("Term", "Estimate", "P Value")
+knitr::kable(x = tb_reading_math, caption = "Reading Scores Models Using Math Score as Additional Predictor", digits = 1)
 
 reading_writing = lm(reading_score ~ . - math_score, data = data) |>
   step(direction = "both")
-reading_writing |> summary()
+
+reading_writing_sum =
+  reading_writing |> 
+  summary()
+
+reading_writing_sum
+
+tb_reading_writing = 
+  reading_writing_sum |>
+  broom::tidy() |>
+  filter(term != "(Intercept)") |> 
+  dplyr::select(term, estimate, p.value)
+colnames(tb_reading_writing) = c("Term", "Estimate", "P Value")
+knitr::kable(x = tb_reading_writing, caption = "Reading Scores Models Using Writing Score as Additional Predictor", digits = 1)
 
 # Writing
 writing_math = lm(writing_score ~ . - reading_score, data = data) |>
   step(direction = "both")
-writing_math |> summary()
+
+writing_math_sum =
+  writing_math |> 
+  summary()
+
+writing_math_sum
+
+tb_writing_math = 
+  writing_math_sum |>
+  broom::tidy() |>
+  filter(term != "(Intercept)") |> 
+  dplyr::select(term, estimate, p.value)
+colnames(tb_writing_math) = c("Term", "Estimate", "P Value")
+knitr::kable(x = tb_writing_math, caption = "Writing Scores Models Using Math Score as Additional Predictor", digits = 1)
 
 writing_reading = lm(writing_score ~ . - math_score, data = data) |>
   step(direction = "both")
-writing_reading |> summary()
+
+writing_reading_sum =
+  writing_reading |> 
+  summary()
+
+writing_reading_sum
+
+tb_writing_reading = 
+  writing_reading_sum |>
+  broom::tidy() |>
+  filter(term != "(Intercept)") |> 
+  dplyr::select(term, estimate, p.value)
+colnames(tb_writing_reading) = c("Term", "Estimate", "P Value")
+knitr::kable(x = tb_writing_reading, caption = "Writing Scores Models Using Reading Score as Additional Predictor", digits = 1)
 ```
 
 
