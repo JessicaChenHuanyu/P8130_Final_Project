@@ -665,5 +665,5 @@ tb_la_writing |>
 # Correlation Plot among Score Variables
 corrplot(cor(data[12:14]), type = "upper")
 main_title <- "Figure 15: Correlation Plot among Score Variables"
-mtext(text = main_title, side = 3, line = -1, outer = TRUE, cex = 1.2, font = 2)
+mtext(text = main_title, side = 3, line = -2, outer = TRUE, cex = 1.2, font = 2)
 ```
