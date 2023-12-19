@@ -447,7 +447,7 @@ corrplot::corrplot(cor(data[12:14]), type = "upper")
 ```{r}
 # Math
 math_reading = lm(math_score ~ . - writing_score, data = data) |>
-  step(direction = "both")
+  step(direction = "both", trace = FALSE)
 
 math_reading_sum =
   math_reading |> 
@@ -464,13 +464,11 @@ colnames(tb_math_reading) = c("Term", "Estimate", "P Value")
 knitr::kable(x = tb_math_reading, caption = "Math Scores Models Using Reading Score as Additional Predictor", digits = 1)
 
 math_writing = lm(math_score ~ . - reading_score, data = data) |>
-  step(direction = "both")
+  step(direction = "both", trace = FALSE)
 
 math_writing_sum =
   math_writing |> 
   summary()
-
-math_writing_sum
 
 tb_math_writing = 
   math_writing_sum |>
@@ -482,13 +480,11 @@ knitr::kable(x = tb_math_writing, caption = "Math Scores Models Using Writing Sc
 
 # Reading
 reading_math = lm(reading_score ~ . - writing_score, data = data) |>
-  step(direction = "both")
+  step(direction = "both", trace = FALSE)
 
 reading_math_sum =
   reading_math |> 
   summary()
-
-reading_math_sum
 
 tb_reading_math = 
   reading_math_sum |>
@@ -499,13 +495,11 @@ colnames(tb_reading_math) = c("Term", "Estimate", "P Value")
 knitr::kable(x = tb_reading_math, caption = "Reading Scores Models Using Math Score as Additional Predictor", digits = 1)
 
 reading_writing = lm(reading_score ~ . - math_score, data = data) |>
-  step(direction = "both")
+  step(direction = "both", trace = FALSE)
 
 reading_writing_sum =
   reading_writing |> 
   summary()
-
-reading_writing_sum
 
 tb_reading_writing = 
   reading_writing_sum |>
@@ -517,13 +511,11 @@ knitr::kable(x = tb_reading_writing, caption = "Reading Scores Models Using Writ
 
 # Writing
 writing_math = lm(writing_score ~ . - reading_score, data = data) |>
-  step(direction = "both")
+  step(direction = "both", trace = FALSE)
 
 writing_math_sum =
   writing_math |> 
   summary()
-
-writing_math_sum
 
 tb_writing_math = 
   writing_math_sum |>
@@ -534,13 +526,11 @@ colnames(tb_writing_math) = c("Term", "Estimate", "P Value")
 knitr::kable(x = tb_writing_math, caption = "Writing Scores Models Using Math Score as Additional Predictor", digits = 1)
 
 writing_reading = lm(writing_score ~ . - math_score, data = data) |>
-  step(direction = "both")
+  step(direction = "both", trace = FALSE)
 
 writing_reading_sum =
   writing_reading |> 
   summary()
-
-writing_reading_sum
 
 tb_writing_reading = 
   writing_reading_sum |>
@@ -559,42 +549,42 @@ vif_math_reading =
   as_tibble() |>
   mutate(VIF_CI = str_c("[", round(VIF_CI_low, 1), ", ", round(VIF_CI_high, 1), "]")) |>
   dplyr::select(Term, VIF, VIF_CI, Tolerance)
-knitr::kable(x = vif_math_reading, caption = "VIF for Math Score", digits = 1)
+knitr::kable(x = vif_math_reading, caption = "VIF for Math Score (include reading score)", digits = 1)
 
 vif_math_writing =
   performance::check_collinearity(math_writing) |>
   as_tibble() |>
   mutate(VIF_CI = str_c("[", round(VIF_CI_low, 1), ", ", round(VIF_CI_high, 1), "]")) |>
   dplyr::select(Term, VIF, VIF_CI, Tolerance)
-knitr::kable(x = vif_math_writing, caption = "VIF for Math Score", digits = 1)
+knitr::kable(x = vif_math_writing, caption = "VIF for Math Score (include writing score)", digits = 1)
 
 vif_reading_math =
   performance::check_collinearity(reading_math) |>
   as_tibble() |>
   mutate(VIF_CI = str_c("[", round(VIF_CI_low, 1), ", ", round(VIF_CI_high, 1), "]")) |>
   dplyr::select(Term, VIF, VIF_CI, Tolerance)
-knitr::kable(x = vif_reading_math, caption = "VIF for Reading Score", digits = 1)
+knitr::kable(x = vif_reading_math, caption = "VIF for Reading Score (include math score)", digits = 1)
 
 vif_reading_writing =
   performance::check_collinearity(reading_writing) |>
   as_tibble() |>
   mutate(VIF_CI = str_c("[", round(VIF_CI_low, 1), ", ", round(VIF_CI_high, 1), "]")) |>
   dplyr::select(Term, VIF, VIF_CI, Tolerance)
-knitr::kable(x = vif_reading_writing, caption = "VIF for Reading Score", digits = 1)
+knitr::kable(x = vif_reading_writing, caption = "VIF for Reading Score (include writing score)", digits = 1)
 
 vif_writing_math =
   performance::check_collinearity(writing_math) |>
   as_tibble() |>
   mutate(VIF_CI = str_c("[", round(VIF_CI_low, 1), ", ", round(VIF_CI_high, 1), "]")) |>
   dplyr::select(Term, VIF, VIF_CI, Tolerance)
-knitr::kable(x = vif_writing_math, caption = "VIF for Reading Score", digits = 1)
+knitr::kable(x = vif_writing_math, caption = "VIF for Writing Score (include math score)", digits = 1)
 
 vif_writing_reading =
   performance::check_collinearity(writing_reading) |>
   as_tibble() |>
   mutate(VIF_CI = str_c("[", round(VIF_CI_low, 1), ", ", round(VIF_CI_high, 1), "]")) |>
   dplyr::select(Term, VIF, VIF_CI, Tolerance)
-knitr::kable(x = vif_writing_reading, caption = "VIF for Reading Score", digits = 1)
+knitr::kable(x = vif_writing_reading, caption = "VIF for Writing Score (include reading score)", digits = 1)
 ```
 
 
