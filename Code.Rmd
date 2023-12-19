@@ -270,7 +270,7 @@ knitr::kable(x = vif_writing, caption = "VIF for Reading Score", digits = 1)
 
 ```{r}
 # math
-math_sr = step(model_math_full, direction = 'both')
+math_sr = step(model_math_full, direction = 'both', trace = FALSE)
 
 res_math_sr = math_sr |> 
   summary()
