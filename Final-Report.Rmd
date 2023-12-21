@@ -49,30 +49,16 @@ tendencies and variability. Then, we have excluded
 the missing cells because predictor variables that we have are factorial data types. The distribution of the three response
 variables is also tested in both histogram and boxplot.
 
-Then we fitted the "full model" using the score of three subjects
-respectively as the response variables, which consists of all 11
-categorical variables as predictors. The model diagnostics are conducted
-by generating four plots for each model: Residuals vs Fitted, Q-Q
-Residuals, Scale-Location, and Residuals vs Leverage.
-Next, we use BIC-based procedures to select the appropriate subsets of
-predictors for three subjects.
+Then we fitted the "full model" using the score of three subjects as the response variables, which consists of all 11
+categorical variables as predictors. The model diagnostics are conducted by generating four plots for each model: Residuals vs Fitted, Q-Q Residuals, Scale-Location, and Residuals vs Leverage. Next, we use BIC-based procedures to select the appropriate subsets of predictors for three subjects.
 
 Based on the full models, we did some tests and calculations: First, we conducted the boxcox method to determine if there was any transformation needed. Second, we calculated Cook's distance to check the existence of outliers and influence points. Finally, in order to test the multicollinearity among predictors, we calculated VIF as the criterion of multicollinearity.
 
-After all the steps above, we conducted model selection using 
-stepwise selection method, criterion-based procedures and LASSO method. We tested predictors, coefficients, and p-values for stepwise method; and we tested predictors and estimated coefficients for BIC-based method. In the selection procedure using LASSO method, for each subject we used
-cross-validation to decide the optimal value of method parameter
-$\lambda$, and then fitted LASSO model with this optimal value.
+After all the steps above, we conducted model selection using stepwise selection method, criterion-based procedures and LASSO method. We tested predictors, coefficients, and p-values for stepwise method; as well as predictors and estimated coefficients for BIC-based method. In the selection procedure using LASSO method, for each subject we used
+cross-validation to decide the optimal value of method parameter $\lambda$, and then fitted LASSO model with this optimal value.
 
-Finally, we tried to figure out if it is possible to leverage one score
-as the auxiliary information to learn the model for another score (still
-its model against variables 1-11) better. we plotted the correlation
-among three score variables. Then we refitted the linear
-models for the scores of three subjects using eleven categorical
-variables and one other score variable of a different subject as
-predictors. The VIFs are calculated for all
-six models generated in this step to reveal the potential
-multicollinearity.
+Finally, we tried to figure out if it is possible to leverage one score as the auxiliary information to learn the model for another score (still its model against variables 1-11) better. we plotted the correlation among three score variables. Then we refitted the linear models for the scores of three subjects using eleven categorical variables and one other score variable of a different subject as predictors. The VIFs are calculated for all six models generated in this step to reveal the potential
+multicollinearity.s
 
 # Results
 
@@ -84,19 +70,21 @@ The distributions of three response score variables are demonstrated in **Figure
 
 **Figure 6** demonstrates the results of boxcox method: the log-likelihood over boxcox method parameter $\lambda$. The biggest likelihood is at around $\lambda=1$, showing that there’s no need for transformation. **Figure 7** demonstrates the Cook's distance, which is an indicator to identify influential outliers within a data set. In R code, rule of thumb suggests that Cook’s distance exceeding 0.5 indicates potential influence. Based on this criterion, it appears that there's no necessity to eliminate any outliers in this case.
 
-**Table 3, 4, 5** display the regression models for math, reading, and writing scores using “both” strategy stepwise regression. To be specific, `gender`, `ethnic group`, `lunch type`, `test preparation`, `parent marital status`, and `weekly study hours` were found to be significant variables for math scores, with an adjusted R-squared of 0.2742. Similarly, the stepwise regression models for reading and writing scores also revealed statistically significant relationships between test scores and predictors, including `gender`, `ethnicity`, `parental education`, `lunch type`, `test preparation`, `parental marital status`, and `weekly study hours`. These predictors explain the model with an adjusted R-squared of 0.2513 for reading and 0.3298 for writing.
+**Table 3, 4, 5** display the regression models for math, reading, and writing scores using multiple stepwise regression. To be specific, `gender`, `ethnic group`, `lunch type`, `test preparation`, `parent marital status`, and `weekly study hours` were found to be significant variables for math scores, with an adjusted R-squared of 0.27. Similarly, the multiple stepwise regression models for reading and writing scores also revealed statistically significant relationships between test scores and predictors, including `gender`, `ethnicity`, `parental education`, `lunch type`, `test preparation`, `parental marital status`, and `weekly study hours`. These predictors explain the model with an adjusted R-squared of 0.25 for reading and 0.33 for writing.
 
-**Table 6, 7, 8** display the result of multicollinearity test: VIFs for three full models. Generally, when VIF > 5, it suggests potential issues of collinearity, which might lead to misleading coefficients. In this model, the VIF values are quite low, ranging between 1 and 1.5, indicating the absence of collinearity issues.
+**Table 6, 7, 8** display the result of multicollinearity test: VIFs for three full models. In this model, all VIF values are quite low, ranging between 1 and 1.5, indicating no collinearity issues.
 
-**Figure 8** displays the relationship between BIC values and the number of selected model variables. Criterion-based procedures suggest that employing regression models for three test scores with 4–5 predictors will yield optimal results with a minimum Bayesian information criterion. **Table 9, 10, 11**, the chosen variables are displayed. Unlike stepwise regression models, criterion-based procedures streamline the selection by excluding the variables `parent marital status` from the math scores model and `parental education`, `parental marital status` from both the reading and writing scores models.
+**Figure 8** displays the relationship between BIC values and the number of selected model variables. Criterion-based procedures suggest that employing regression models for three test scores with 4 or 5 predictors will yield optimal results with a minimum Bayesian information criterion. The chosen variables are displayed in **Table 9, 10, 11**. Unlike stepwise regression models, criterion-based procedures streamline the selection by excluding the variables `parent marital status` from the math scores model and `parental education`, `parental marital status` from both the reading and writing scores models.
 
 For LASSO model, we demonstrate the process of selecting the optimal lambda value. In **Figures 9-11**, we identify the lambda value corresponding to the minimum mean cross-validation error as providing the best fit for the model. **Figures 12-14** illustrate the relationship between lambda values and the degree of variable shrinkage. **Table 12, 13, 14** show the selected variables by LASSO. Comparing to stepwise regression models, LASSO expanded the model of math scores by including `parental education`, `time spent in sports`, and `the number of siblings`, and it expands the models of writing scores by including `the number of siblings`. The model of reading scores holds the same as which generated from stepwise regression model.
 
-**Figure 15** shows the correlation among score variables, suggesting the feasibility of using one of the score variables as the auxiliary information to learn another one. **Table 15-20** are the results of regression using one subject score as an additional predictor for the prediction of another subject score. **Table 21-26** shows the VIFs of these six models, indicating the multicollinearity among predictors. The inclusion of an additional test score as a predictor resulted in a significant increase in the adjusted R square to greater than 0.8 without introducing collinearity problems or altering the effects of the existing predictors. This emphasizes the interdependence of test scores and their potential as predictive variables for each other, thereby enhancing the models' predictive capacity.
+**Figure 15** shows the correlation among score variables, suggesting the feasibility of using one of the score variables as the auxiliary information to learn another one. **Table 15-20** are the results of regression using one subject score as an additional predictor for the prediction of another subject score. **Table 21-26** shows the VIFs of these six models, indicating there is still no multicollinearity among predictors. Generally speaking, the inclusion of an additional test score as a predictor resulted in a significant increase in the adjusted R square to greater than 0.8 without introducing collinearity problems or altering the effects of the existing predictors. This emphasizes the interdependence of test scores and their potential as predictive variables for each other, thereby enhancing the models' predictive capacity.
 
 # Conclusions
 
-Overall, we tried several regression models that worked successfully in pointing out the key factors affecting math, reading, and writing scores and in quantifying the specific effects of different classifications in these factors. While the categorical data provided viable results, we found that some points were still not explained by the regression given the relatively low coeficient of determination. This limitation suggests the need for broader and more detailed data collection. With continuous refinement of the data, we may be able to effectively adjust educational strategies in the future.
+Overall, we tried several regression models that worked successfully in pointing out the key factors affecting math, reading, and writing scores and in quantifying the specific effects of different classifications in these factors. We would like to highlight that including another test score as a predictor can significantly enhanced performance of regression model among all three subjects. 
+
+Although the categorical data provided feasibility results, we found that some points were still not fully explained by the regression model. This limitation suggests the need for broader and more detailed data collection. With continuous refinement of the data, we may be able to effectively adjust educational strategies in the future.
 
 # Contribution
 
@@ -104,6 +92,7 @@ Overall, we tried several regression models that worked successfully in pointing
 
 **Longyu Zhang**: Interpretation, **Huanyu Chen**: Writing
 
+\newpage
 # Appendix
 
 ## Table
