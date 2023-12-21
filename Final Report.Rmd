@@ -7,7 +7,7 @@ output:
   pdf_document:
     latex_engine: pdflatex
 fontsize: 11pt
-linestretch: 2
+linestretch: 1.8
 ---
 
 ```{r, include=FALSE}
