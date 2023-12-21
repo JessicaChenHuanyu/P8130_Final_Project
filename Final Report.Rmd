@@ -25,36 +25,35 @@ set.seed(1)
 ```
 
 # Abstract
-This study used regression modeling techniques to predict academic performance in math, reading, and writing based on multiple variables, including personal characteristics and environmental factors. Using stepwise regression and LASSO analyses, we found significant relationships between test scores and several covariants, including gender, race, parent education, lunch type, test preparation, and weekly study time. We further found that including another test score as a predictor (e.g., consider reading scores when predicting math scores) significantly enhanced model performance without destroying the effect of the existing predictor. This comprehensive analysis reveals the complex relationships between predictors and student performance, providing suggestions to educators and thus achieving overall student progress.
+This study used regression modeling techniques to predict academic performance in math, reading, and writing based on multiple variables, including personal characteristics and socio-environmental factors. Using stepwise regression, criterion-based procedures, and LASSO analyses, we found significant relationships between test scores and several covariants, including gender, race, parent education, lunch type, test preparation, and weekly study time. We further found that including another test score as a predictor (e.g., consider reading scores when predicting math scores) significantly enhanced model performance. This comprehensive analysis reveals the complex relationships between predictors and student performance, providing suggestions to educators and thus achieving overall student progress.
 
 # Introduction
 
 The objective of this study is to use regression models to predict
 academic performance in math, reading, and writing based on various
-variables, including personal characteristics such as gender, ethnicity,
-and parental education, as well as environmental factors like lunch
-type, test preparation, and weekly study hours. Furthermore, the study
+variables, including personal characteristics such as gender, ethnicity, test preparation, and weekly study hours, as well as socio-environmental factors like lunch
+type, transportation and parental education. Furthermore, the study
 aims to identify potential correlations and regression models between
 scores in different subjects. The combination of these analyses is
 intended to provide educators and policymakers with practical insights
 for tailoring interventions, improving educational programs, and
-building strong support structures that promote students' overall
+building strong support to students' overall
 academic progress.
 
 # Methods
 
-This dataset provides information on public school students, including
+This data set provides information on public school students, including
 three test scores and various personal and socioeconomic factors. To
 facilitate analysis, categorical data have been converted to numerical
-representations based on their ordinal order or type. We have excluded
-the missing cells because they are factorial data types.
+representations based on their ordinal order or type.
 
-After processing the data, we created **Table 1**, which presents a
+Before pre-processing the data, we created **Table 1**, which presents a
 summary of the factorial data, including the number of missing data, the
 number of categories under each variable, and the top counts. For the
 numeric data (three test scores), we constructed a comprehensive
 descriptive table (**Table 2**) to provide a snapshot of central
-tendencies and variability. The distribution of the three response
+tendencies and variability. Then, we have excluded
+the missing cells because predictor variables we have are factorial data types. The distribution of the three response
 variables (test scores) is presented in **Figure 1** (histogram) and
 **Figure 2** (boxplot), indicating a normal distribution.
 
@@ -70,15 +69,13 @@ Based on the full models, we did some tests and calculations:
 
 First, we conducted the boxcox method (**Figure 10**) to determine if there was any transformation needed. Second, we calculated Cook's distance (**Figure 11**) to check the existence of outliers and influence points. Finally, in order to test the multicollinearity among predictors, we calculated VIF as the criterion of multicollinearity (**Table 3,4,5**).
 
-After all the steps above, we conducted model selection using both
-stepwise selection method and LASSO method. For stepwise method, the
-remaining predictors, coefficients, and p-values are reported in **Table
-6,7,8**.
+After all the steps above, we conducted model selection using 
+stepwise selection method, criterion-based procedures and LASSO method. For stepwise method, the
+remaining predictors, coefficients, and p-values are reported in **Table 6,7,8**.
 
 In the selection procedure using LASSO method, for each subject we used
 cross-validation to decide the optimal value of method parameter
-$\lambda$, and then fitted LASSO model with this optimal value (**Figure
-12,13,14**).
+$\lambda$, and then fitted LASSO model with this optimal value (**Figure 12,13,14**).
 
 Finally, we tried to figure out if it is possible to leverage one score
 as the auxiliary information to learn the model for another score (still
@@ -92,16 +89,14 @@ multicollinearity (**Table 15,16,17,18,19,20**).
 
 # Results
 
-**Table 1** gives the summary of the factorial data. **Table 2**
-provides the mean, deviation, and quantile information about the
-continuous data (score variables of three subjects). The distribution of
-three response score variables are demonstrated in **Figure 1**
-(histogram) and **Figure 2** (boxplot).
+**Table 1** gives the summary of the factorial data. **Table 2** provides the mean, deviation, and quantile information about the continuous data (score variables of three subjects). A total of 786 missing values were identified. After removing the missing values from the original dataset, 354 observations remained out of the initial 948. Since categorical variables hold specific meanings on their values, we opted not to impute missing values using the mean.
 
-**Table 6**, **Table 7**, and **Table 8** display the regression models
-for math, reading, and writing scores using both forward and backward
-stepwise regression. Moreover, **Figure 3**, **Figure 4**, and
-**Figure 5** display the diagnostic plots generated by the model.
+The distributions of three response score variables are demonstrated in **Figure 1** (histogram) and **Figure 2** (boxplot). Both the histogram and boxplot distributions showed a normal distribution. Overall, the score distributions for the three subjects are quite similar, with an average around 70 points. As indicated by the boxplot, outliers are predominantly situated within the lower score ranges.
+
+**Figure 3**, **Figure 4**, and **Figure 5** display the diagnostic plots generated by the model. The diagnosis of full models indicated that the model adheres to the basic assumptions of linear regression, including homoscedasticity, normality, independent residuals with constant variance, and that there was no need for transformations.
+
+**Table 3**, **Table 4**, and **Table 5** display the regression models for math, reading, and writing scores using “both” strategy stepwise regression. To be specific, `gender`, `ethnic group`, `lunch type`, `test preparation`, `parent marital status`, and `weekly study hours` were found to be significant variables for math scores, with an adjusted R-squared of 0.2742. Similarly, the stepwise regression models for reading and writing scores also revealed statistically significant relationships between test scores and predictors, including `gender`, `ethnicity`, `parental education`, `lunch type`, `test preparation`, `parental marital status`, and `weekly study hours`. These predictors explain the model with an adjusted R-squared of 0.2513 for reading and 0.3298 for writing.
+-------------------------
 
 **Figure 6** displays the BIC over number of parameters for models of
 three subjects. **Figure 7,8,9** shows the BIC consistent with the
@@ -121,23 +116,14 @@ fitting of LASSO models.
 
 **Figure 15** shows the correlation existing among score variables,
 suggesting the feasibility of using one of the score variables as the
-auxiliary information to learn the model for another score. **Table
-9,10,11,12,13,14** are the results of regression using one subject score
+auxiliary information to learn the model for another score. **Table 9,10,11,12,13,14** are the results of regression using one subject score
 as an additional predictor for the prediction of another subject score.
 **Table 15,16,17,18,19,20** shows the VIFs of these six models,
 indicating the multicollinearity among predictors.
 
 # Conclusions
 
-Both the histogram and boxplot distributions showed a normal distribution. Moreover, the full model diagnosis indicated that there was no need for transformations of the test scores and that there was no multicollinearity among predictors. Criterion-based procedures suggest that employing regression models for three test scores with 4–5 predictors will yield optimal results with a minimum Bayesian information criterion. These approaches guide the construction of effective models for the three test scores.
-
-The stepwise regression and LASSO techniques revealed significant predictors for math, reading, and writing scores. To be specific, gender, ethnic group, lunch type, test preparation, parent marital status, and weekly study hours were found to be significant variables for math scores, with an adjusted R-squared of 0.2742. In addition, LASSO expanded the model by including parental education, time spent in sports, and the number of siblings.
-
-Similarly, the stepwise regression models for reading and writing scores also revealed statistically significant relationships between test scores and predictors, including gender, ethnicity, parental education, lunch type, test preparation, parental marital status, and weekly study hours. These predictors explain the model with an adjusted R-squared of 0.2513 for reading and 0.3298 for writing. Furthermore, the LASSO analysis expands the models by including two variables: whether the student is the first child and the number of siblings.
-
-Furthermore, the inclusion of an additional test score as a predictor resulted in a significant increase in the adjusted R square to greater than 0.8 without introducing collinearity problems or altering the effects of the existing predictors. This emphasizes the interdependence of test scores and their potential as predictive variables for each other, thereby enhancing the models' predictive capacity.
-
-The combination of various analytical approaches not only identified important factors affecting test scores but also established the best model structures, leading to a detailed comprehension of the complex relationship between predictors and student test results. This thorough analysis provides a basis for making informed decisions and implementing targeted interventions to improve academic performance and promote fair educational outcomes.
+Overall, we tried several regression models that worked successfully in pointing out the key factors affecting math, reading, and writing scores and in quantifying the specific effects of different classifications in these factors. While the categorical data provided viable results, we found that some points were still not explained by the regression given the relatively low coeficient of determination. This limitation suggests the need for broader and more detailed data collection. With continuous refinement of the data, we may be able to effectively adjust educational strategies in the future.
 
 # Contribution
 
@@ -286,6 +272,77 @@ tb_wri_sr = wri_sr |>
   dplyr::select(term, estimate, p.value)
 colnames(tb_wri_sr) = c("Term", "Estimate", "P Value")
 knitr::kable(x = tb_wri_sr, caption = "Writing Scores Models by Stepwise Regression", digits = 2)
+```
+
+```{r}
+lambda_seq = 10 ^ seq(-2, 2, by = .1)
+
+#math
+cv_object_math = 
+  cv.glmnet(as.matrix(data[1:11]), data$math_score,
+                         lambda = lambda_seq,
+                         nfolds = 5)
+
+opt_lambda_math = cv_object_math$lambda.min
+
+#math result
+model_math_lasso = glmnet(as.matrix(data[1:11]), data$math_score, lambda = opt_lambda_math, alpha = 1)
+res_math_lasso = 
+  coef(model_math_lasso) |>
+  as.matrix() |>
+  as_tibble() |>
+  mutate(term = rownames(coef(model_math_lasso))) |>
+  dplyr::select(term, everything()) |>
+  filter(term != "(Intercept)") |>
+  filter(s0 != 0)
+colnames(res_math_lasso) = c("Term", "Estimate")
+knitr::kable(x = res_math_lasso, caption = "Math Scores Models by Lasso Model", digits = 1)
+```
+
+```{r}
+#reading
+cv_object_reading = 
+  cv.glmnet(as.matrix(data[1:11]), data$reading_score,
+                         lambda = lambda_seq,
+                         nfolds = 5)
+
+opt_lambda_reading = cv_object_reading$lambda.min
+
+#reading result
+model_reading_lasso = glmnet(as.matrix(data[1:11]), data$reading_score, lambda = opt_lambda_reading, alpha = 1)
+res_reading_lasso = 
+  coef(model_reading_lasso) |>
+  as.matrix() |>
+  as_tibble() |>
+  mutate(term = rownames(coef(model_reading_lasso))) |>
+  dplyr::select(term, everything()) |>
+  filter(term != "(Intercept)") |>
+  filter(s0 != 0)
+colnames(res_reading_lasso) = c("Term", "Estimate")
+knitr::kable(x = res_reading_lasso, caption = "Reading Scores Models by Lasso Model", digits = 1)
+```
+
+```{r}
+#writing
+cv_object_writing = 
+  cv.glmnet(as.matrix(data[1:11]), data$writing_score,
+                         lambda = lambda_seq,
+                         nfolds = 5)
+
+opt_lambda_writing = cv_object_writing$lambda.min
+
+#writing result
+model_writing_lasso = glmnet(as.matrix(data[1:11]), data$writing_score, lambda = opt_lambda_writing, alpha = 1)
+res_writing_lasso = 
+  coef(model_writing_lasso) |>
+  as.matrix() |>
+  as_tibble() |>
+  mutate(term = rownames(coef(model_writing_lasso))) |>
+  dplyr::select(term, everything()) |>
+  filter(term != "(Intercept)") |>
+  filter(s0 != 0)
+colnames(res_writing_lasso) = c("Term", "Estimate")
+knitr::kable(x = res_writing_lasso, caption = "Writing Scores Models by Lasso Model", digits = 1)
 ```
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
@@ -662,8 +719,53 @@ tb_la_writing |>
 ```
 
 ```{r echo=FALSE, warning=FALSE, message=FALSE}
+#math
+glmnet(as.matrix(data[1:11]), data$math_score, lambda = lambda_seq) |>
+  broom::tidy() |>
+  dplyr::select(term, lambda, estimate) |> 
+  complete(term, lambda, fill = list(estimate = 0) ) |> 
+  filter(term != "(Intercept)") |> 
+  ggplot(aes(x = log(lambda, 10), y = estimate, group = term, color = term)) + 
+  geom_path(size = 0.8) + 
+  geom_vline(xintercept = log(opt_lambda_math, 10), color = "red", linetype = "dashed", size = 1) +
+  labs(title = "Figure 15: Lasso Variables Contraction for Math") +
+  theme_bw() +
+  theme(plot.title = element_text(size = 15, face = "bold", hjust = 0.5), legend.position = "bottom")
+```
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+#reading
+glmnet(as.matrix(data[1:11]), data$reading_score, lambda = lambda_seq) |>
+  broom::tidy() |>
+  dplyr::select(term, lambda, estimate) |> 
+  complete(term, lambda, fill = list(estimate = 0) ) |> 
+  filter(term != "(Intercept)") |> 
+  ggplot(aes(x = log(lambda, 10), y = estimate, group = term, color = term)) + 
+  geom_path(size = 0.8) + 
+  geom_vline(xintercept = log(opt_lambda_reading, 10), color = "red", linetype = "dashed", size = 1) +
+  labs(title = "Figure 16: Lasso Variables Contraction for Reading") +
+  theme_bw() +
+  theme(plot.title = element_text(size = 15, face = "bold", hjust = 0.5), legend.position = "bottom")
+```
+
+```{r echo=FALSE, warning=FALSE, message=FALSE}
+#writing
+glmnet(as.matrix(data[1:11]), data$writing_score, lambda = lambda_seq) |>
+  broom::tidy() |>
+  dplyr::select(term, lambda, estimate) |> 
+  complete(term, lambda, fill = list(estimate = 0) ) |> 
+  filter(term != "(Intercept)") |> 
+  ggplot(aes(x = log(lambda, 10), y = estimate, group = term, color = term)) + 
+  geom_path(size = 0.8) + 
+  geom_vline(xintercept = log(opt_lambda_writing, 10), color = "red", linetype = "dashed", size = 1) +
+  labs(title = "Figure 17: Lasso Variables Contraction for writing") +
+  theme_bw() +
+  theme(plot.title = element_text(size = 15, face = "bold", hjust = 0.5), legend.position = "bottom")
+```
+
+```{r echo=FALSE, warning=FALSE, message=FALSE, fig.width = 10, fig.height = 12}
 # Correlation Plot among Score Variables
 corrplot(cor(data[12:14]), type = "upper")
-main_title <- "Figure 15: Correlation Plot among Score Variables"
+main_title <- "Figure 18: Correlation Plot among Score Variables"
 mtext(text = main_title, side = 3, line = -2, outer = TRUE, cex = 1.2, font = 2)
 ```

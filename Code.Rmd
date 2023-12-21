@@ -85,16 +85,6 @@ data =
     ) |>
   mutate(nr_siblings = factor(nr_siblings))
 
-'
-# Deal with NA -- Calculate the column mean (round to integer) and plug it into NA cell
-column_means <- round(colMeans(data, na.rm = TRUE), digits = 0)
-for (col in names(data)) {
-  data[[col]][is.na(data[[col]])] <- column_means[col]
-  }
-
-head(data)
-'
-
 # Another data set for EDA
 data_long <- data |>
   pivot_longer(cols = c(math_score, reading_score, writing_score),
@@ -191,7 +181,7 @@ par(mfrow = c(2,2))
 plot(model_writing_full)
 ```
 
-# Criterion-based Procedures
+# criterion-based Procedures
 
 ```{r}
 math_c = regsubsets(math_score ~ . - reading_score - writing_score, data = data)
@@ -201,12 +191,12 @@ res_math =
 
 reading_c = regsubsets(reading_score ~ . - math_score - writing_score, data = data)
 res_reading =
-  reading_c |>
+  math_c |>
   summary()
 
 writing_c = regsubsets(writing_score ~ . - math_score - reading_score, data = data)
 res_writing =
-  writing_c |>
+  math_c |>
   summary()
 
 par(mfrow = c(1, 3), mar = c(8, 4, 4, 1))
@@ -214,13 +204,9 @@ plot(1:8, res_math$bic, xlab = "# of parameters", ylab = "BIC")
 plot(1:8, res_reading$bic, xlab = "# of parameters", ylab = "BIC")
 plot(1:8, res_writing$bic, xlab = "# of parameters", ylab = "BIC")
 
-par(mfrow = c(1, 1))
 res_math$outmat[5,]
-plot(math_c, scale = "bic")
 res_reading$outmat[5,]
-plot(reading_c, scale = "bic")
 res_writing$outmat[5,]
-plot(writing_c, scale = "bic")
 ```
 
 # Transformation
@@ -354,8 +340,16 @@ tb_la_math |>
 
 #math result
 model_math_lasso = glmnet(as.matrix(data[1:11]), data$math_score, lambda = opt_lambda_math, alpha = 1)
-coef(model_math_lasso)
-model_math_lasso$dev.ratio
+res_math_lasso = 
+  coef(model_math_lasso) |>
+  as.matrix() |>
+  as_tibble() |>
+  mutate(term = rownames(coef(model_math_lasso))) |>
+  dplyr::select(term, everything()) |>
+  filter(term != "(Intercept)") |>
+  filter(s0 != 0)
+colnames(res_math_lasso) = c("Term", "Estimate")
+knitr::kable(x = res_math_lasso, caption = "Math Scores Models by Lasso Model", digits = 1)
 ```
 
 
@@ -392,9 +386,17 @@ tb_la_reading |>
   theme_bw()
 
 #reading result
-model_reading_lasso = glmnet(as.matrix(data[1:11]), data$reading_score, lambda = opt_lambda_math, alpha = 1)
-coef(model_reading_lasso)
-model_reading_lasso$dev.ratio
+model_reading_lasso = glmnet(as.matrix(data[1:11]), data$reading_score, lambda = opt_lambda_reading, alpha = 1)
+res_reading_lasso = 
+  coef(model_reading_lasso) |>
+  as.matrix() |>
+  as_tibble() |>
+  mutate(term = rownames(coef(model_reading_lasso))) |>
+  dplyr::select(term, everything()) |>
+  filter(term != "(Intercept)") |>
+  filter(s0 != 0)
+colnames(res_reading_lasso) = c("Term", "Estimate")
+knitr::kable(x = res_reading_lasso, caption = "Reading Scores Models by Lasso Model", digits = 1)
 ```
 
 
@@ -432,11 +434,19 @@ tb_la_writing |>
 
 #writing result
 model_writing_lasso = glmnet(as.matrix(data[1:11]), data$writing_score, lambda = opt_lambda_writing, alpha = 1)
-coef(model_writing_lasso)
-model_writing_lasso$dev.ratio
+res_writing_lasso = 
+  coef(model_writing_lasso) |>
+  as.matrix() |>
+  as_tibble() |>
+  mutate(term = rownames(coef(model_writing_lasso))) |>
+  dplyr::select(term, everything()) |>
+  filter(term != "(Intercept)") |>
+  filter(s0 != 0)
+colnames(res_writing_lasso) = c("Term", "Estimate")
+knitr::kable(x = res_writing_lasso, caption = "Writing Scores Models by Lasso Model", digits = 1)
 ```
 
-## Adding one score variable
+## adding one score variable
 
 ```{r}
 #correlation plot for scores
@@ -447,98 +457,30 @@ corrplot::corrplot(cor(data[12:14]), type = "upper")
 ```{r}
 # Math
 math_reading = lm(math_score ~ . - writing_score, data = data) |>
-  step(direction = "both", trace = FALSE)
-
-math_reading_sum =
-  math_reading |> 
-  summary()
-
-math_reading_sum
-
-tb_math_reading = 
-  math_reading_sum |>
-  broom::tidy() |>
-  filter(term != "(Intercept)") |> 
-  dplyr::select(term, estimate, p.value)
-colnames(tb_math_reading) = c("Term", "Estimate", "P Value")
-knitr::kable(x = tb_math_reading, caption = "Math Scores Models Using Reading Score as Additional Predictor", digits = 1)
+  step(direction = "both")
+math_reading |> summary()
 
 math_writing = lm(math_score ~ . - reading_score, data = data) |>
-  step(direction = "both", trace = FALSE)
-
-math_writing_sum =
-  math_writing |> 
-  summary()
-
-tb_math_writing = 
-  math_writing_sum |>
-  broom::tidy() |>
-  filter(term != "(Intercept)") |> 
-  dplyr::select(term, estimate, p.value)
-colnames(tb_math_writing) = c("Term", "Estimate", "P Value")
-knitr::kable(x = tb_math_writing, caption = "Math Scores Models Using Writing Score as Additional Predictor", digits = 1)
+  step(direction = "both")
+math_writing |> summary()
 
 # Reading
 reading_math = lm(reading_score ~ . - writing_score, data = data) |>
-  step(direction = "both", trace = FALSE)
-
-reading_math_sum =
-  reading_math |> 
-  summary()
-
-tb_reading_math = 
-  reading_math_sum |>
-  broom::tidy() |>
-  filter(term != "(Intercept)") |> 
-  dplyr::select(term, estimate, p.value)
-colnames(tb_reading_math) = c("Term", "Estimate", "P Value")
-knitr::kable(x = tb_reading_math, caption = "Reading Scores Models Using Math Score as Additional Predictor", digits = 1)
+  step(direction = "both")
+reading_math |> summary()
 
 reading_writing = lm(reading_score ~ . - math_score, data = data) |>
-  step(direction = "both", trace = FALSE)
-
-reading_writing_sum =
-  reading_writing |> 
-  summary()
-
-tb_reading_writing = 
-  reading_writing_sum |>
-  broom::tidy() |>
-  filter(term != "(Intercept)") |> 
-  dplyr::select(term, estimate, p.value)
-colnames(tb_reading_writing) = c("Term", "Estimate", "P Value")
-knitr::kable(x = tb_reading_writing, caption = "Reading Scores Models Using Writing Score as Additional Predictor", digits = 1)
+  step(direction = "both")
+reading_writing |> summary()
 
 # Writing
 writing_math = lm(writing_score ~ . - reading_score, data = data) |>
-  step(direction = "both", trace = FALSE)
-
-writing_math_sum =
-  writing_math |> 
-  summary()
-
-tb_writing_math = 
-  writing_math_sum |>
-  broom::tidy() |>
-  filter(term != "(Intercept)") |> 
-  dplyr::select(term, estimate, p.value)
-colnames(tb_writing_math) = c("Term", "Estimate", "P Value")
-knitr::kable(x = tb_writing_math, caption = "Writing Scores Models Using Math Score as Additional Predictor", digits = 1)
+  step(direction = "both")
+writing_math |> summary()
 
 writing_reading = lm(writing_score ~ . - math_score, data = data) |>
-  step(direction = "both", trace = FALSE)
-
-writing_reading_sum =
-  writing_reading |> 
-  summary()
-
-tb_writing_reading = 
-  writing_reading_sum |>
-  broom::tidy() |>
-  filter(term != "(Intercept)") |> 
-  dplyr::select(term, estimate, p.value)
-colnames(tb_writing_reading) = c("Term", "Estimate", "P Value")
-knitr::kable(x = tb_writing_reading, caption = "Writing Scores Models Using Reading Score as Additional Predictor", digits = 1)
+  step(direction = "both")
+writing_reading |> summary()
 ```
 
 
@@ -549,42 +491,42 @@ vif_math_reading =
   as_tibble() |>
   mutate(VIF_CI = str_c("[", round(VIF_CI_low, 1), ", ", round(VIF_CI_high, 1), "]")) |>
   dplyr::select(Term, VIF, VIF_CI, Tolerance)
-knitr::kable(x = vif_math_reading, caption = "VIF for Math Score (include reading score)", digits = 1)
+knitr::kable(x = vif_math_reading, caption = "VIF for Math Score", digits = 1)
 
 vif_math_writing =
   performance::check_collinearity(math_writing) |>
   as_tibble() |>
   mutate(VIF_CI = str_c("[", round(VIF_CI_low, 1), ", ", round(VIF_CI_high, 1), "]")) |>
   dplyr::select(Term, VIF, VIF_CI, Tolerance)
-knitr::kable(x = vif_math_writing, caption = "VIF for Math Score (include writing score)", digits = 1)
+knitr::kable(x = vif_math_writing, caption = "VIF for Math Score", digits = 1)
 
 vif_reading_math =
   performance::check_collinearity(reading_math) |>
   as_tibble() |>
   mutate(VIF_CI = str_c("[", round(VIF_CI_low, 1), ", ", round(VIF_CI_high, 1), "]")) |>
   dplyr::select(Term, VIF, VIF_CI, Tolerance)
-knitr::kable(x = vif_reading_math, caption = "VIF for Reading Score (include math score)", digits = 1)
+knitr::kable(x = vif_reading_math, caption = "VIF for Reading Score", digits = 1)
 
 vif_reading_writing =
   performance::check_collinearity(reading_writing) |>
   as_tibble() |>
   mutate(VIF_CI = str_c("[", round(VIF_CI_low, 1), ", ", round(VIF_CI_high, 1), "]")) |>
   dplyr::select(Term, VIF, VIF_CI, Tolerance)
-knitr::kable(x = vif_reading_writing, caption = "VIF for Reading Score (include writing score)", digits = 1)
+knitr::kable(x = vif_reading_writing, caption = "VIF for Reading Score", digits = 1)
 
 vif_writing_math =
   performance::check_collinearity(writing_math) |>
   as_tibble() |>
   mutate(VIF_CI = str_c("[", round(VIF_CI_low, 1), ", ", round(VIF_CI_high, 1), "]")) |>
   dplyr::select(Term, VIF, VIF_CI, Tolerance)
-knitr::kable(x = vif_writing_math, caption = "VIF for Writing Score (include math score)", digits = 1)
+knitr::kable(x = vif_writing_math, caption = "VIF for Reading Score", digits = 1)
 
 vif_writing_reading =
   performance::check_collinearity(writing_reading) |>
   as_tibble() |>
   mutate(VIF_CI = str_c("[", round(VIF_CI_low, 1), ", ", round(VIF_CI_high, 1), "]")) |>
   dplyr::select(Term, VIF, VIF_CI, Tolerance)
-knitr::kable(x = vif_writing_reading, caption = "VIF for Writing Score (include reading score)", digits = 1)
+knitr::kable(x = vif_writing_reading, caption = "VIF for Reading Score", digits = 1)
 ```
 
 
