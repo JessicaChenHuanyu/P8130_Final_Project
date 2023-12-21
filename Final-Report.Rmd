@@ -7,7 +7,7 @@ output:
   pdf_document:
     latex_engine: pdflatex
 fontsize: 11pt
-linestretch: 1.72
+linestretch: 1.75
 ---
 
 ```{r, include=FALSE}
@@ -46,15 +46,14 @@ three test scores and various personal and socioeconomic factors. To
 facilitate analysis, categorical data have been converted to numerical
 representations based on their ordinal order or type.
 
-Before pre-processing the data, we created **Table 1**, which presents a
-summary of the factorial data, including the number of missing data, the
+When pre-processing the data, we created a summary of the factorial data, including the number of missing data, the
 number of categories under each variable, and the top counts. For the
 numeric data (three test scores), we constructed a comprehensive
 descriptive table to provide a snapshot of central
 tendencies and variability. Then, we have excluded
 the missing cells because predictor variables we have are factorial data types. The distribution of the three response
-variables (test scores) is presented in **Figure 1** (histogram) and
-**Figure 2** (boxplot), indicating a normal distribution.
+variables (test scores) is also tested in histogram and
+boxplot.
 
 Then we fitted the "full model" using the score of three subjects
 respectively as the response variables, which consists of all 11
@@ -67,8 +66,7 @@ predictors for three subjects.
 Based on the full models, we did some tests and calculations: First, we conducted the boxcox method to determine if there was any transformation needed. Second, we calculated Cook's distance to check the existence of outliers and influence points. Finally, in order to test the multicollinearity among predictors, we calculated VIF as the criterion of multicollinearity.
 
 After all the steps above, we conducted model selection using 
-stepwise selection method, criterion-based procedures and LASSO method. For stepwise method, the
-remaining predictors, coefficients, and p-values are reported in **Table 3,4,5**. For BIC-based method, the remaining predictors and estimated coefficients are reported in **Table 9,10,11**. In the selection procedure using LASSO method, for each subject we used
+stepwise selection method, criterion-based procedures and LASSO method. We tested predictors, coefficients, and p-values for stepwise method; and we tested predictors and estimated coefficients for BIC-based method. In the selection procedure using LASSO method, for each subject we used
 cross-validation to decide the optimal value of method parameter
 $\lambda$, and then fitted LASSO model with this optimal value.
 
