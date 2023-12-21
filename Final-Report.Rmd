@@ -31,17 +31,12 @@ This study used regression modeling techniques to predict academic performance i
 
 The objective of this study is to use regression models to predict
 academic performance in math, reading, and writing based on various
-variables, including personal characteristics such as gender, ethnicity, test preparation, and weekly study hours, as well as socio-environmental factors like lunch
-type, transportation and parental education. Furthermore, the study
-aims to identify potential correlations and regression models between
-scores in different subjects. The combination of these analyses is
-intended to provide educators and policymakers with practical insights
-for tailoring interventions, improving educational programs, and
-building strong support to students' overall academic progress.
+variables, including personal characteristics such as gender, ethnicity, test preparation, and weekly study hours, as well as socio-environmental factors like lunch type, transportation and parent education. Furthermore, the study aims to identify potential correlations and regression models between scores among different subjects. The combination of these analyses is
+intended to provide educators and policymakers with practical insights for tailoring interventions.
 
 # Methods
 
-This data set provides information on public school students, including
+This dataset provides information on public school students, including
 three test scores and various personal and socioeconomic factors. To
 facilitate analysis, categorical data have been converted to numerical
 representations based on their ordinal order or type.
@@ -51,9 +46,8 @@ number of categories under each variable, and the top counts. For the
 numeric data (three test scores), we constructed a comprehensive
 descriptive table to provide a snapshot of central
 tendencies and variability. Then, we have excluded
-the missing cells because predictor variables we have are factorial data types. The distribution of the three response
-variables (test scores) is also tested in histogram and
-boxplot.
+the missing cells because predictor variables that we have are factorial data types. The distribution of the three response
+variables is also tested in both histogram and boxplot.
 
 Then we fitted the "full model" using the score of three subjects
 respectively as the response variables, which consists of all 11
