@@ -62,15 +62,15 @@ categorical variables as predictors. The model diagnostics are conducted
 by generating four plots for each model: Residuals vs Fitted, Q-Q
 Residuals, Scale-Location, and Residuals vs Leverage (**Figure 3,4,5**).
 Next, we use BIC-based procedures to select the appropriate subsets of
-predictors for three subjects (**Figure 6,7,8,9**).
+predictors for three subjects (**Figure 8**).
 
-Based on the full models, we did some tests and calculations: First, we conducted the boxcox method (**Figure 10**) to determine if there was any transformation needed. Second, we calculated Cook's distance (**Figure 11**) to check the existence of outliers and influence points. Finally, in order to test the multicollinearity among predictors, we calculated VIF as the criterion of multicollinearity (**Table 3,4,5**).
+Based on the full models, we did some tests and calculations: First, we conducted the boxcox method (**Figure 6**) to determine if there was any transformation needed. Second, we calculated Cook's distance (**Figure 7**) to check the existence of outliers and influence points. Finally, in order to test the multicollinearity among predictors, we calculated VIF as the criterion of multicollinearity (**Table 6,7,8**).
 
 After all the steps above, we conducted model selection using 
 stepwise selection method, criterion-based procedures and LASSO method. For stepwise method, the
-remaining predictors, coefficients, and p-values are reported in **Table 6,7,8**. In the selection procedure using LASSO method, for each subject we used
+remaining predictors, coefficients, and p-values are reported in **Table 3,4,5**. For BIC-based method, the remaining predictors and estimated coefficients are reported in **Table 9,10,11**. In the selection procedure using LASSO method, for each subject we used
 cross-validation to decide the optimal value of method parameter
-$\lambda$, and then fitted LASSO model with this optimal value (**Figure 12,13,14**).
+$\lambda$ (**Figure 9,10,11**), and then fitted LASSO model with this optimal value (**Figure 12,13,14; Table 12,13,14**).
 
 Finally, we tried to figure out if it is possible to leverage one score
 as the auxiliary information to learn the model for another score (still
@@ -78,9 +78,9 @@ its model against variables 1-11) better. we plotted the correlation
 among three score variables (**Figure 15**). Then we refitted the linear
 models for the scores of three subjects using eleven categorical
 variables and one other score variable of a different subject as
-predictors (**Table 9,10,11,12,13,14**). The VIFs are calculated for all
+predictors (**Table 15,16,17,18,19,20**). The VIFs are calculated for all
 six models generated in this step to reveal the potential
-multicollinearity (**Table 15,16,17,18,19,20**).
+multicollinearity (**Table 21,22,23,24,25,26**).
 
 # Results
 
@@ -771,7 +771,7 @@ glmnet(as.matrix(data[1:11]), data$writing_score, lambda = lambda_seq) |>
   theme(plot.title = element_text(size = 15, face = "bold", hjust = 0.5), legend.position = "bottom")
 ```
 
-```{r echo=FALSE, warning=FALSE, message=FALSE, fig.width = 10, fig.height = 12}
+```{r echo=FALSE, warning=FALSE, message=FALSE, fig.width = 6, fig.height = 7}
 # Correlation Plot among Score Variables
 corrplot(cor(data[12:14]), type = "upper")
 main_title <- "Figure 15: Correlation Plot among Score Variables"
