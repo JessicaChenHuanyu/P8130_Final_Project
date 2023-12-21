@@ -529,4 +529,33 @@ vif_writing_reading =
 knitr::kable(x = vif_writing_reading, caption = "VIF for Reading Score", digits = 1)
 ```
 
+## interaction
+```{r}
+math_test_interaction = lm(math_score ~ . -reading_score - writing_score + wkly_study_hours:test_prep , data = data) |>
+  step(direction = "both", trace = FALSE)
+math_test_interaction |> summary()
 
+math_test_interaction = lm(math_score ~ . -reading_score - writing_score + parent_marital_status:lunch_type, data = data) |>
+  step(direction = "both", trace = FALSE)
+math_test_interaction |> summary()
+```
+
+```{r}
+reading_test_interaction = lm(reading_score ~ . -math_score - writing_score + wkly_study_hours:test_prep , data = data) |>
+  step(direction = "both", trace = FALSE)
+reading_test_interaction |> summary()
+
+reading_test_interaction = lm(reading_score ~ . -math_score - writing_score + parent_marital_status:lunch_type, data = data) |>
+  step(direction = "both", trace = FALSE)
+reading_test_interaction |> summary()
+```
+
+```{r}
+writing_test_interaction = lm(writing_score ~ . -math_score - reading_score + wkly_study_hours:test_prep , data = data) |>
+  step(direction = "both", trace = FALSE)
+writing_test_interaction |> summary()
+
+writing_test_interaction = lm(writing_score ~ . -math_score - reading_score + parent_marital_status:lunch_type, data = data) |>
+  step(direction = "both", trace = FALSE)
+writing_test_interaction |> summary()
+```

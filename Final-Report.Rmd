@@ -6,8 +6,12 @@ author:
 output:
   pdf_document:
     latex_engine: pdflatex
-fontsize: 11pt
-linestretch: 1.75
+header-includes:
+  - \usepackage{setspace}
+  - \setstretch{1.9}
+  - \usepackage{titlesec}
+  - \fontsize{11}{12}\selectfont 
+  - \titleformat{\section}{\normalfont\Large\bfseries}{\thesection}{1em}{}
 ---
 
 ```{r, include=FALSE}
@@ -58,7 +62,7 @@ After all the steps above, we conducted model selection using stepwise selection
 cross-validation to decide the optimal value of method parameter $\lambda$, and then fitted LASSO model with this optimal value.
 
 Finally, we tried to figure out if it is possible to leverage one score as the auxiliary information to learn the model for another score (still its model against variables 1-11) better. we plotted the correlation among three score variables. Then we refitted the linear models for the scores of three subjects using eleven categorical variables and one other score variable of a different subject as predictors. The VIFs are calculated for all six models generated in this step to reveal the potential
-multicollinearity.s
+multicollinearity.
 
 # Results
 
@@ -80,11 +84,12 @@ For LASSO model, we demonstrate the process of selecting the optimal lambda valu
 
 **Figure 15** shows the correlation among score variables, suggesting the feasibility of using one of the score variables as the auxiliary information to learn another one. **Table 15-20** are the results of regression using one subject score as an additional predictor for the prediction of another subject score. **Table 21-26** shows the VIFs of these six models, indicating there is still no multicollinearity among predictors. Generally speaking, the inclusion of an additional test score as a predictor resulted in a significant increase in the adjusted R square to greater than 0.8 without introducing collinearity problems or altering the effects of the existing predictors. This emphasizes the interdependence of test scores and their potential as predictive variables for each other, thereby enhancing the models' predictive capacity.
 
+In addition, we test the possibility of interaction terms in the stepwise regression model. Specifically, we think parent education may correlate with lunch type, and weekly study hours may correlate with test preparation. However, the multiple stepwise regression does not show these interaction terms as significant predictors.
+
 # Conclusions
+Overall, we tried several regression models that worked successfully in pointing out the key factors affecting math, reading, and writing scores and in quantifying the specific effects of different classifications in these factors. We would like to highlight that including another test score as a predictor can significantly enhance the performance of the regression model among all three subjects compared to others. To be specific, `gender`, `ethnic group`, `lunch type`, `test preparation`, `parent education`, `weekly study hours`, and `writing score` were found to be significant variables for math scores, with an adjusted R-squared of 0.88. Similarly, the multiple stepwise regression models for reading scores revealed significant predictors including `gender`, `ethnic group`, `test preparation`, `practice sport`, and `writing score` with an adjusted R-squared of 0.93. For writing scores, the multiple regression model showed `gender`, `ethnic group`, `lunch type`, `test preparation`,  `practice sport`, and `reading score` as predictors for the same adjusted R-squared of 0.93 as reading scores, but with one fewer predictor.
 
-Overall, we tried several regression models that worked successfully in pointing out the key factors affecting math, reading, and writing scores and in quantifying the specific effects of different classifications in these factors. We would like to highlight that including another test score as a predictor can significantly enhanced performance of regression model among all three subjects. 
-
-Although the categorical data provided feasibility results, we found that some points were still not fully explained by the regression model. This limitation suggests the need for broader and more detailed data collection. With continuous refinement of the data, we may be able to effectively adjust educational strategies in the future.
+Although the categorical data provided feasibility results, we found that the regression model still did not fully explain some points. This limitation suggests the need for broader and more detailed data collection. With continuous refinement of the data, we may be able to adjust educational strategies in the future effectively.
 
 # Contribution
 
